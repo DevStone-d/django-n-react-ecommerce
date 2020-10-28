@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
-from panel.models import Discount
-from products.models import Product,ProductDetail
 # Create your models here.
+from products.models import ProductDetail
+
+
 
 class MyAccountManager(BaseUserManager):
     def create_user(self,email,first_name,last_name,password):
@@ -37,13 +38,14 @@ class MyAccountManager(BaseUserManager):
 		
 
 class Account(AbstractBaseUser):
+    username = None
     email					= models.EmailField(verbose_name="email", max_length=60, unique=True)
     first_name              = models.CharField(max_length=200)
     last_name               = models.CharField(max_length=200)
     phone                   = models.CharField(verbose_name="phone",max_length=30,blank=True,null=True)
     date_joined             = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login              = models.DateTimeField(verbose_name='last login', auto_now=True)
-    date_of_birth           = models.DateField(verbose_name='last login',blank=True,null=True)
+    date_of_birth           = models.DateField(verbose_name='birth date',blank=True,null=True)
     """
         Gender : 
             -1: Belirtmek istemiyorum
@@ -89,7 +91,7 @@ class Order(models.Model):
     customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
     address                 = models.ForeignKey(Adress,on_delete=models.CASCADE,related_name="adress")
     items                   = models.ManyToManyField(ProductDetail)
-    discount                = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
+    #discount                = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
     created                 = models.DateTimeField(verbose_name='date created', auto_now_add=True)
     """
     Status Means :
