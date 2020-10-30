@@ -41,6 +41,16 @@ class Product(models.Model):
     thumbnail       = models.URLField()
     is_active       = models.BooleanField(default=1)
 
+    # def get_categories(self):
+    #     categories = []
+    #     try:
+    #         print(self.category)
+    #         for category in self.category:
+    #             categories.append(category.name)
+    #     except:
+    #         pass
+    #     return categories
+
     def get_slug(self):
         slug = slugify(self.name)
         unique = slug

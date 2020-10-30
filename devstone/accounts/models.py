@@ -6,6 +6,7 @@ from products.models import ProductDetail
 
 
 class MyAccountManager(BaseUserManager):
+    ##TOKEN VERİLECEK
     def create_user(self,email,first_name,last_name,password):
         if not email:
             raise ValueError("Users must have an email address")

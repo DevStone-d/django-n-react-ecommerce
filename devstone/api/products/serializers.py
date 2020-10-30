@@ -24,7 +24,8 @@ class ListProductDetailAPIView(serializers.ModelSerializer):
             'price',
             'stock',
             'variant',
-            'variable'
+            'variable',
+            'thumbnail'
         ]
 
 class ListProductMediaAPIView(serializers.ModelSerializer):
@@ -44,7 +45,8 @@ class ListProductTagAPIView(serializers.ModelSerializer):
             'product',
             'tag',
         ]
-# kampanyalar
+
+
 #     - kategori kampanyalari
 #     - urun kampanyalari
 #     - user kampanyalari
