@@ -51,20 +51,3 @@ def CollectionDetailList(request,slug):
     responsibleData['products'] =  productsSerializer.data
 
     return Response(responsibleData)
-
-# class CollectionDetailList(ListAPIView):
-#     serializer_class = ListCollectionDetailAPIView
-#     permission_classes = [AllowAny]
-#     def get_queryset(self):
-#         try:
-#             category = Collection.objects.get(slug=self.kwargs['category'])
-#             queryset = Product.objects.filter(category=category)
-#         except Collection.DoesNotExist:
-#             queryset = Product.objects.filter(pk=0)
-#             return queryset
-#         return queryset
-
-        
-
-        
-        

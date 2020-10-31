@@ -12,9 +12,11 @@ from api.products.serializers import ListProductsAPIView,ListProductDetailAPIVie
 #models
 from products.models import Collection, Product, ProductDetail, ProductMedia , Tag
 
+
 class addProduct(ListCreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     serializer_class = ListProductsAPIView
+    permission_classes = [AllowAny]
     queryset = Product.objects.all()
 
 @api_view(['POST','GET'])
@@ -49,6 +51,10 @@ def addProductDetail(request,pk):
             return Response(data)
 
         productSerializer = ListProductDetailAPIView(data=request.data)
+
+        if request.data['product'] != pk :
+            data            = {'detail':'Invalid operation'}
+            return Response(data)
 
         if productSerializer.is_valid():
             productSerializer.save()
