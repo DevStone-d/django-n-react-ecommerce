@@ -11,16 +11,26 @@ from api.products.serializers import ListProductsAPIView,ListProductDetailAPIVie
 
 #models
 from products.models import Collection, Product, ProductDetail, ProductMedia , Tag
-
+#custom permissions
+from api.permissions import (
+    IsStore,
+    IsDelivery,
+    IsBurhan,
+    IsEditor,
+    IsStaff,
+    IsAccounting,
+    IsCustomerService,
+    IsBakery
+)
 
 class addProduct(ListCreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     serializer_class = ListProductsAPIView
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsEditor,IsAdminUser]
     queryset = Product.objects.all()
 
 @api_view(['POST','GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsEditor,IsAdminUser])
 @authentication_classes([SessionAuthentication, BasicAuthentication]) # +TokenAuthentication
 def addProductDetail(request,pk):
     if request.method == 'GET':
@@ -92,13 +102,19 @@ def productDetail(request,pk):
         return Response(data)
 
     productDetail       = ProductDetail.objects.filter(product=product)
+    productMedia        = ProductMedia.objects.filter(product=product)
+    productTag          = Tag.objects.filter(product=product)
 
     productSeri         = ListProductsAPIView(xproduct,many=True)
     productDetailSeri   = ListProductDetailAPIView(productDetail,many=True)
+    productMediaSeri    = ListProductMediaAPIView(productMedia,many=True)
+    productTagSeri      = ListProductTagAPIView(productTag,many=True)
 
     responsibleData = {}
     responsibleData['product'] = productSeri.data
     responsibleData['variants'] = productDetailSeri.data
+    responsibleData['medias'] = productMediaSeri.data
+    responsibleData['tags']   = productTagSeri.data
 
     return Response(responsibleData)
 
@@ -115,41 +131,8 @@ class ProductsTagList(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = ListProductTagAPIView
 
-
-class ProductDetailList(ListAPIView):
-    # queryset = ProductDetail.objects.all()
-    serializer_class = ListProductDetailAPIView
+class ProductsMediaList(ListAPIView):
+    queryset = ProductMedia.objects.all()
     permission_classes = [AllowAny]
-    # lookup_field = "pk"
-    def get_queryset(self):
-        try:
-            product = Product.objects.get(slug=self.kwargs['slug'])
-            queryset = ProductDetail.objects.filter(product=product)
-        except Product.DoesNotExist:
-            queryset = ProductDetail.objects.filter(pk=0)
-            return queryset
-        return queryset
-
-class ProductMediaList(ListAPIView):
     serializer_class = ListProductMediaAPIView
-    permission_classes = [AllowAny]
-    def get_queryset(self):
-        try:
-            product = Product.objects.get(slug=self.kwargs['slug'])
-            queryset = ProductMedia.objects.filter(product=product)
-        except Product.DoesNotExist:
-            queryset = ProductMedia.objects.filter(pk=0)
-            return queryset
-        return queryset
 
-class ProductTagList(ListAPIView):
-    serializer_class = ListProductTagAPIView
-    permission_classes = [AllowAny]
-    def get_queryset(self):
-        try:
-            product = Product.objects.get(slug=self.kwargs['slug'])
-            queryset = Tag.objects.filter(product=product)
-        except Product.DoesNotExist:
-            queryset = Tag.objects.filter(pk=0)
-            return queryset
-        return queryset
