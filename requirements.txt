@@ -1,6 +1,6 @@
-django = "*"
-djangorestframework = "*"
-django-rest-knox = "*"
-psycopg2 = "*"
-django-allauth = "*"
-django-rest-auth[with_social] = "*"
+django 
+djangorestframework 
+django-rest-knox 
+psycopg2
+django-allauth 
+django-rest-auth[with_social]
