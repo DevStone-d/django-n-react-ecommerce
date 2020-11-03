@@ -17,7 +17,16 @@ from rest_framework.generics import (
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 
-
+from api.permissions import (
+    IsStore,
+    IsDelivery,
+    IsBurhan,
+    IsEditor,
+    IsStaff,
+    IsAccounting,
+    IsCustomerService,
+    IsBakery
+)
 from api.account.serializers import AccountDetailSerializer,UserSerializer
 from accounts.models import Account
 

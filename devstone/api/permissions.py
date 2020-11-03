@@ -1,4 +1,4 @@
-from rest_framework.permission import BasePermission
+from rest_framework.permissions import BasePermission
 
 class IsStore(BasePermission):
     message = "You do not have a permission to make this request." 
