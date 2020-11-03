@@ -3,8 +3,6 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 # Create your models here.
 from products.models import ProductDetail
 
-
-
 class MyAccountManager(BaseUserManager):
     ##TOKEN VERİLECEK
     def create_user(self,email,first_name,last_name,password):
@@ -60,6 +58,12 @@ class Account(AbstractBaseUser):
     is_staff                = models.BooleanField(default=False) #-1,0-1-2-3 staff perm, different perms
     is_store                = models.BooleanField(default=False)
     is_customer             = models.BooleanField(default=False)
+    is_bakery               = models.BooleanField(default=False)
+    is_delivery             = models.BooleanField(default=False)
+    is_burhan               = models.BooleanField(default=False)
+    is_editor               = models.BooleanField(default=False)
+    is_accounting           = models.BooleanField(default=False)
+    is_customerservice      = models.BooleanField(default=False)
     date_activate           = models.DateField(verbose_name="date of activate",blank = True, null=True)
 
     USERNAME_FIELD = 'email'

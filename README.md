@@ -51,7 +51,7 @@ all = [
 ]
 
 requirements = [
-
+###   API
     ##ADMIN CALLS
     api/products/disable/<int:pk> -> disable the product DO NOT DELETE
     api/products/enable/<int:pk> -> enable the product
@@ -103,4 +103,17 @@ requirements = [
 
     ##ADMIN CALLS
     api/site/log
+
+### PERMS
+    is_store
+    is_delivery
+    is_burhan
+    is_editor
+    is_staff
+    is_accounting
+    is_customerservice
+    is_bakery
+
+
+
 ]
