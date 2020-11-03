@@ -119,27 +119,6 @@ def productDetail(request,pk):
 
     return Response(responsibleData)
 
-
-# class ProductDisable(RetrieveUpdateAPIView):
-#     queryset = Product.objects.all()
-#     permission_classes = [IsAdminUser]
-#     serializer_class = ProductDisableAPIView
-#     lookup_field = "slug"
-#     def perform_update(self, serializer):
-#         serializer.save(is_active=False)
-#         return super().perform_update(serializer)
-
-# class ProductDisable(RetrieveDestroyAPIView):
-#     permission_classes = [IsAdminUser]
-#     authentication_classes = [SessionAuthentication, BasicAuthentication]
-#     serializer_class = ProductDisableAPIView
-#     queryset = Product.objects.all()
-#     lookup_field = 'slug'
-#     def perform_destroy(self, serializer):
-#         serializer.is_active = False
-#         serializer.save()
-#         return serializer
-
 class ProductStatus(RetrieveUpdateAPIView):
     permission_classes = [IsAdminUser]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
