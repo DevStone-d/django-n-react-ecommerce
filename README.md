@@ -16,6 +16,7 @@ Django and React E-commerce project
         -detail/<int:pk>
         -tag
         -tag/<slug>
+        -status/<slug>
     c.account/
         -profile
         -editprofile
@@ -40,6 +41,7 @@ all = [
     api/products/add/detail/<int:pk>
     api/products/tag
     api/products/tag/<slug>
+    api/products/status/<slug>
 
     api/account/profile
     api/account/editprofile
@@ -53,8 +55,6 @@ all = [
 requirements = [
 ###   API
     ##ADMIN CALLS
-    api/products/disable/<int:pk> -> disable the product DO NOT DELETE
-    api/products/enable/<int:pk> -> enable the product
     api/products/delete/<int:pk>/detail/<int:pk> -> delete the product's detail
     api/products/edit/<slug>
     api/products/edit/<slug>/detail/<int:pk>
