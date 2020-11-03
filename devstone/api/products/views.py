@@ -3,9 +3,9 @@ from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView,RetrieveAPIView,ListCreateAPIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.permissions import AllowAny,IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view,permission_classes,authentication_classes
-from rest_framework.authentication import BasicAuthentication,SessionAuthentication
+from rest_framework.authentication import BasicAuthentication,SessionAuthentication, TokenAuthentication
 #our serializers
 from api.products.serializers import ListProductsAPIView,ListProductDetailAPIView, ListProductMediaAPIView,ListProductTagAPIView
 
@@ -16,12 +16,12 @@ from products.models import Collection, Product, ProductDetail, ProductMedia , T
 class addProduct(ListCreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     serializer_class = ListProductsAPIView
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
     queryset = Product.objects.all()
 
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
+@authentication_classes([SessionAuthentication, BasicAuthentication]) # +TokenAuthentication
 def addProductDetail(request,pk):
     if request.method == 'GET':
         try:
