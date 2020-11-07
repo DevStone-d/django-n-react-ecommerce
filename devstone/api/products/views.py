@@ -1,13 +1,24 @@
 from django.shortcuts import render
 
 
-from rest_framework.generics import ListAPIView,RetrieveAPIView,ListCreateAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import (ListAPIView,
+                                    RetrieveAPIView,
+                                    ListCreateAPIView, 
+                                    RetrieveUpdateAPIView, 
+                                    RetrieveDestroyAPIView,
+                                    )
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view,permission_classes,authentication_classes
 from rest_framework.authentication import BasicAuthentication,SessionAuthentication, TokenAuthentication
 #our serializers
-from api.products.serializers import ListProductsAPIView,ListProductDetailAPIView, ListProductMediaAPIView,ListProductTagAPIView, ProductStatusAPIView
+from api.products.serializers import (
+                                        ListProductsAPIView,
+                                        ListProductDetailAPIView,
+                                        ListProductMediaAPIView,
+                                        ListProductTagAPIView, 
+                                        ProductStatusAPIView
+                                        )
 
 #models
 from products.models import Collection, Product, ProductDetail, ProductMedia , Tag
@@ -142,4 +153,22 @@ class ProductsMediaList(ListAPIView):
     queryset = ProductMedia.objects.all()
     permission_classes = [AllowAny]
     serializer_class = ListProductMediaAPIView
+
+class DeleteProductDetail(RetrieveDestroyAPIView):
+    serializer_class = ListProductDetailAPIView
+    permission_classes = [IsAdminUser]
+    queryset = ProductDetail.objects.all()
+    lookup_field = 'pk'
+
+class EditProduct(RetrieveUpdateAPIView):
+    serializer_class = ListProductsAPIView
+    permission_classes = [IsAdminUser]
+    queryset = Product.objects.all()
+    lookup_field = 'slug'
+
+class EditProductDetail(RetrieveUpdateAPIView):
+    serializer_class = ListProductDetailAPIView
+    permission_classes = [IsAdminUser]
+    queryset = ProductDetail.objects.all()
+    lookup_field = 'pk'
 

@@ -55,10 +55,13 @@ all = [
 requirements = [
 ###   API
     ##ADMIN CALLS
-    api/products/delete/<int:pk>/detail/<int:pk> -> delete the product's detail
-    api/products/edit/<slug>
-    api/products/edit/<slug>/detail/<int:pk>
+    api/products/delete/detail/<int:pk> -> delete the product's detail      OK
+    api/products/edit/<slug>                                                OK
+    api/products/edit/detail/<int:pk>                                       OK
 
+
+    THESE FUTURE APIs MUST BE HAVE MODELS
+    
     ##USER CALLS
     api/cart -> user_token, cart.is_active
     api/cart/add
