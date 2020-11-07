@@ -16,6 +16,7 @@ Django and React E-commerce project
         -detail/<int:pk>
         -tag
         -tag/<slug>
+        -status/<slug>
     c.account/
         -profile
         -editprofile
@@ -40,6 +41,7 @@ all = [
     api/products/add/detail/<int:pk>
     api/products/tag
     api/products/tag/<slug>
+    api/products/status/<slug>
 
     api/account/profile
     api/account/editprofile
@@ -53,8 +55,6 @@ all = [
 requirements = [
 ###   API
     ##ADMIN CALLS
-    api/products/disable/<int:pk> -> disable the product DO NOT DELETE
-    api/products/enable/<int:pk> -> enable the product
     api/products/delete/<int:pk>/detail/<int:pk> -> delete the product's detail
     api/products/edit/<slug>
     api/products/edit/<slug>/detail/<int:pk>
@@ -64,11 +64,13 @@ requirements = [
     api/cart/add
     api/cart/delete/<int:pk> -> delete one item
     api/cart/all/delete -> delete whole items from cart
+    #3 gun sepet aktif, guest alisveris, sepette urunleriniz kaldi maili,odeme ekranina gelmeden bilgilerini alalim arka planda uyelik olussun
 
     ##ADMIN CALLS -> admin auth
     api/campaigns
     api/campaigns/public -> allow any
     api/campaigns/detail/<int:pk> -> user auth
+
     api/campaigns/edit/<int:pk>
     api/campaigns/add
     api/campaigns/disable/<int:pk>
@@ -91,16 +93,20 @@ requirements = [
     api/account/favorites
     api/account/favorites/add/<int:pk> -> look for product detail's pk
     api/account/favorites/delete/<int:pk>
-
+    #kac kisi fav'a ekledi
 
     api/account/collections -> allow any, shareable
     api/account/collections/add -> user auth
+
     api/account/collections/delete/<slug> -> user auth
     api/account/collections/detail/<slug> -> allow any
     api/account/collections/detail/<slug>/product/add -> user auth, input: product 
     api/account/collections/detail/<slug>/product/delete -> user auth
 
-
+    #Bunu da satin
+    #arama sonrasi sonuc yok
+    #arama gecmisi
+    
     ##ADMIN CALLS
     api/site/log
 

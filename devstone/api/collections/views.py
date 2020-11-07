@@ -37,7 +37,11 @@ class addCollection(ListCreateAPIView):
     queryset = Collection.objects.all()
 
 class deleteCollection(RetrieveDestroyAPIView):
+<<<<<<< HEAD
     permission_classes = [IsEditor,IsAdminUser]
+=======
+    permission_classes = [IsAdminUser]
+>>>>>>> bedc2bebe8d4c7a7139e1f4b0e8c9da3d262e821
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     serializer_class = ListCollectionsAPIView
     queryset = Collection.objects.all()

@@ -1,13 +1,13 @@
 from django.shortcuts import render
 
 
-from rest_framework.generics import ListAPIView,RetrieveAPIView,ListCreateAPIView
+from rest_framework.generics import ListAPIView,RetrieveAPIView,ListCreateAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view,permission_classes,authentication_classes
 from rest_framework.authentication import BasicAuthentication,SessionAuthentication, TokenAuthentication
 #our serializers
-from api.products.serializers import ListProductsAPIView,ListProductDetailAPIView, ListProductMediaAPIView,ListProductTagAPIView
+from api.products.serializers import ListProductsAPIView,ListProductDetailAPIView, ListProductMediaAPIView,ListProductTagAPIView, ProductStatusAPIView
 
 #models
 from products.models import Collection, Product, ProductDetail, ProductMedia , Tag
@@ -28,6 +28,7 @@ class addProduct(ListCreateAPIView):
     serializer_class = ListProductsAPIView
     permission_classes = [IsEditor,IsAdminUser]
     queryset = Product.objects.all()
+    
 
 @api_view(['POST','GET'])
 @permission_classes([IsEditor,IsAdminUser])
@@ -118,6 +119,12 @@ def productDetail(request,pk):
 
     return Response(responsibleData)
 
+class ProductStatus(RetrieveUpdateAPIView):
+    permission_classes = [IsAdminUser]
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    serializer_class = ProductStatusAPIView
+    queryset = Product.objects.all()
+    lookup_field = 'slug'
 
 
 class ProductList(ListAPIView):

@@ -11,8 +11,18 @@ class ListProductsAPIView(serializers.ModelSerializer):
             'description',
             'video_url',
             'slug',
-            'meta_desc'
+            'meta_desc',
+            'is_active'
         ]
+class ProductStatusAPIView(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'slug',
+            'is_active'
+        ]
+
 
 class ListProductDetailAPIView(serializers.ModelSerializer):
     class Meta:
