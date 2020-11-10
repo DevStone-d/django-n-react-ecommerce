@@ -91,27 +91,52 @@ class Adress(models.Model):
     def __str__(self):
         return f"{self.adress_first_name} {self.adress_last_name} - {self.adresss} {self.city}/{self.country}"
     
-
-class Order(models.Model):
+class Cart(models.Model):
+    STATUS_MEANS = [
+        ('-1','Error'),
+        ('0','Shopping'),
+        ('1','Waiting for seller'),
+        ('2','Payment Approved'),
+        ('3','Order is preparing'),
+        ('4','Shipped')
+    ]
     customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
     address                 = models.ForeignKey(Adress,on_delete=models.CASCADE,related_name="adress")
-    items                   = models.ManyToManyField(ProductDetail)
-    #discount                = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
+    #discount               = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
     created                 = models.DateTimeField(verbose_name='date created', auto_now_add=True)
-    """
-    Status Means :
-        -1 : Error
-        0  : İade
-        1  : Ödeme bekleniyor
-        2  : Ödeme alındı
-        3  : Sipariş hazırlanıyor
-        4  : Kargoya verildi
-     
-     """
-    status                  = models.IntegerField() 
-    amount                  = models.FloatField()
+    ordered                 = models.BooleanField(default=0,editable=False)
+    status                  = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")
+    amount                  = models.FloatField(editable=False,default=0.0)
 
-    # def total(self):
-    #     for item in self.items:
-    #         total_price += item
-    #     return total_price
+    def get_amount(self,*args):
+        total = self.amount
+        for i in args:
+            total += i.price
+        self.amount = total
+        return self.save()
+
+    def item_delete(self,*args):
+        total = self.amount
+        for i in args:
+            total -= i.price
+        self.amount = total
+        return self.save()
+
+
+    def __str__(self):
+        return f"Cart id: {self.id} Customer: {self.customer} "
+
+class OrderedItem(models.Model):
+    cart            = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart")
+    item            = models.ForeignKey(ProductDetail,on_delete=models.CASCADE,related_name="item")
+
+    def save(self,*args,**kwargs):
+        self.cart.get_amount(self.item)
+        return super(OrderedItem,self).save(*args,**kwargs)
+    
+    def delete(self,*args,**kwargs):
+        self.cart.item_delete(self.item)
+        return super(OrderedItem,self).delete(*args,**kwargs)
+
+    def __str__(self):
+        return f"{self.cart.customer} added {self.item} to the cart : {self.cart.id}"

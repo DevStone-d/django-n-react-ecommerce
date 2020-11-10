@@ -1,14 +1,30 @@
 from rest_framework import serializers
-from accounts.models import Account
+from accounts.models import Account,Cart,OrderedItem
 from rest_auth.serializers import UserDetailsSerializer
 
+class CartListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = [
+            'id', 
+            'customer', 
+            'address', 
+            'created',
+            'ordered',
+            'status',
+            'amount',
+            ]
+
+class OrderedItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderedItem
+        fields = [
+            'id', 
+            'cart', 
+            'item',
+            ]
 
 class AccountDetailSerializer(serializers.ModelSerializer):
-    # first_name  = serializers.CharField(max_length=100)
-    # last_name   = serializers.CharField(max_length=100)
-    # phone       = serializers.CharField(max_length=100)
-    # date_of_birth = serializers.DateTimeField()
-    # gender = serializers.IntegerField()
     class Meta:
         model = Account
         fields = [

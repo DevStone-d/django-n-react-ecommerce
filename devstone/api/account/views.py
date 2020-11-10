@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,authentication_classes,permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.authentication import SessionAuthentication,BasicAuthentication
 from rest_framework.generics import (
     DestroyAPIView,
@@ -12,6 +12,8 @@ from rest_framework.generics import (
     RetrieveAPIView,
     GenericAPIView
 )
+
+from rest_framework.viewsets import ModelViewSet
 
 # Create your views here.
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
@@ -27,8 +29,8 @@ from api.permissions import (
     IsCustomerService,
     IsBakery
 )
-from api.account.serializers import AccountDetailSerializer,UserSerializer
-from accounts.models import Account
+from api.account.serializers import AccountDetailSerializer,UserSerializer,OrderedItemSerializer,CartListSerializer
+from accounts.models import Account,Cart,OrderedItem
 
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
@@ -60,3 +62,29 @@ class AuthInfoUpdateView(GenericAPIView):
             serializer.update(usermail=request.user.email)
             return Response({"message":"Profile succesfully update"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CartList(ListAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartListSerializer
+    permission_classes = [AllowAny]
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def CartDetail(request,pk):
+    try:
+        cart        = Cart.objects.get(id=pk)
+        queryset    = OrderedItem.objects.filter(cart=cart)
+    except Cart.DoesNotExist:
+        data            = {'detail':'Cart does not exist'}
+        return Response(data)
+
+    cart                = Cart.objects.filter(id=pk)
+
+    cartSerializer      = CartListSerializer(cart,many=True)
+    oProductsSerializer = OrderedItemSerializer(queryset,many=True)
+
+    responsibleData = {}
+    responsibleData['cart']             =  cartSerializer.data
+    responsibleData['ordered products'] =  oProductsSerializer.data
+
+    return Response(responsibleData)
