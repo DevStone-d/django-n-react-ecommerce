@@ -52,6 +52,10 @@ all = [
     api-auth/logout
 ]
 
+
+kargoya verilmeden adres degisikligi talebi olusturulabilir
+giftboy.com hediyecim.com - online hediye gonderimi, steam code, vouchers, trendyol, zara alisveris karti
+
 requirements = [
 ###   API
     ##ADMIN CALLS

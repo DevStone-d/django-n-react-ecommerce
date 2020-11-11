@@ -91,7 +91,35 @@ class Adress(models.Model):
     def __str__(self):
         return f"{self.adress_first_name} {self.adress_last_name} - {self.adresss} {self.city}/{self.country}"
     
+
 class Cart(models.Model):
+    customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
+    ordered                 = models.BooleanField(default=0,editable=False)
+    total                   = models.FloatField(editable=False,default=0.0)
+    #discount                = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
+
+    def check_amount(self,req_amount):
+        total = 0.0
+        items = OrderedItem.object.filter(cart = self.id)
+        for i in items:
+            total += (i.item.price * i.item.quantity)
+        print("requested amount= ",req_amount)
+        print("calculated total= ",total)
+        print("self.amount= ",self.amount)
+        if (req_amount == total) and (self.amount == req_amount) :
+            return True
+        return False
+#sepetim'e gidilince quantity-> +1/-1 olabilir ya da quantity direkt guncellenebilir
+
+class OrderedItem(models.Model):
+    cart            = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart")
+    item            = models.ForeignKey(ProductDetail,on_delete=models.CASCADE,related_name="item")
+    quantity        = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.cart.customer} added {self.item} to the cart : {self.cart.id}"
+
+class Order(models.Model):
     STATUS_MEANS = [
         ('-1','Error'),
         ('0','Shopping'),
@@ -100,43 +128,27 @@ class Cart(models.Model):
         ('3','Order is preparing'),
         ('4','Shipped')
     ]
-    customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
+    cart                    = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart")
     address                 = models.ForeignKey(Adress,on_delete=models.CASCADE,related_name="adress")
-    #discount               = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
     created                 = models.DateTimeField(verbose_name='date created', auto_now_add=True)
-    ordered                 = models.BooleanField(default=0,editable=False)
     status                  = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")
     amount                  = models.FloatField(editable=False,default=0.0)
+    #discount                = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
 
-    def get_amount(self,*args):
-        total = self.amount
-        for i in args:
-            total += i.price
-        self.amount = total
-        return self.save()
-
-    def item_delete(self,*args):
-        total = self.amount
-        for i in args:
-            total -= i.price
-        self.amount = total
-        return self.save()
-
+    #customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
+    #ordered                 = models.BooleanField(default=0,editable=False)
+    # def check_amount(self,req_amount):
+    #     total = 0.0
+    #     items = OrderedItem.object.filter(cart = self.id)
+    #     for i in items:
+    #         total += (i.item.price * i.item.quantity)
+    #     print("requested amount= ",req_amount)
+    #     print("calculated total= ",total)
+    #     print("self.amount= ",self.amount)
+    #     if (req_amount == total) and (self.amount == req_amount) :
+    #         return True
+    #     return False
 
     def __str__(self):
         return f"Cart id: {self.id} Customer: {self.customer} "
 
-class OrderedItem(models.Model):
-    cart            = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart")
-    item            = models.ForeignKey(ProductDetail,on_delete=models.CASCADE,related_name="item")
-
-    def save(self,*args,**kwargs):
-        self.cart.get_amount(self.item)
-        return super(OrderedItem,self).save(*args,**kwargs)
-    
-    def delete(self,*args,**kwargs):
-        self.cart.item_delete(self.item)
-        return super(OrderedItem,self).delete(*args,**kwargs)
-
-    def __str__(self):
-        return f"{self.cart.customer} added {self.item} to the cart : {self.cart.id}"

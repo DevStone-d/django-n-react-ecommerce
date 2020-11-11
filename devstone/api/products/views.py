@@ -172,3 +172,7 @@ class EditProductDetail(RetrieveUpdateAPIView):
     queryset = ProductDetail.objects.all()
     lookup_field = 'pk'
 
+# class HomeView(ListView):
+#     model = Product
+#     paginate_by = 10
+#     template_name = "home.html"

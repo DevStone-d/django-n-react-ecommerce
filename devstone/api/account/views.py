@@ -10,11 +10,9 @@ from rest_framework.generics import (
     ListAPIView,
     UpdateAPIView,
     RetrieveAPIView,
-    GenericAPIView
+    GenericAPIView,
 )
-
 from rest_framework.viewsets import ModelViewSet
-
 # Create your views here.
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
@@ -29,8 +27,9 @@ from api.permissions import (
     IsCustomerService,
     IsBakery
 )
-from api.account.serializers import AccountDetailSerializer,UserSerializer,OrderedItemSerializer,CartListSerializer
-from accounts.models import Account,Cart,OrderedItem
+from api.account.serializers import AccountDetailSerializer,UserSerializer,OrderedItemSerializer,CartListSerializer,OrderListSerializer
+from accounts.models import Account,Order,Cart,OrderedItem
+from products.models import ProductDetail
 
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
@@ -63,11 +62,6 @@ class AuthInfoUpdateView(GenericAPIView):
             return Response({"message":"Profile succesfully update"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CartList(ListAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartListSerializer
-    permission_classes = [AllowAny]
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def CartDetail(request,pk):
@@ -88,3 +82,7 @@ def CartDetail(request,pk):
     responsibleData['ordered products'] =  oProductsSerializer.data
 
     return Response(responsibleData)
+
+        
+
+        
