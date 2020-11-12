@@ -112,9 +112,9 @@ class Cart(models.Model):
 #sepetim'e gidilince quantity-> +1/-1 olabilir ya da quantity direkt guncellenebilir
 
 class OrderedItem(models.Model):
-    cart            = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart")
+    cart            = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="orderedItems")
     item            = models.ForeignKey(ProductDetail,on_delete=models.CASCADE,related_name="item")
-    quantity        = models.IntegerField(default=0)
+    quantity        = models.IntegerField()
 
     def __str__(self):
         return f"{self.cart.customer} added {self.item} to the cart : {self.cart.id}"
@@ -128,7 +128,7 @@ class Order(models.Model):
         ('3','Order is preparing'),
         ('4','Shipped')
     ]
-    cart                    = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart")
+    cart                    = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="order")
     address                 = models.ForeignKey(Adress,on_delete=models.CASCADE,related_name="adress")
     created                 = models.DateTimeField(verbose_name='date created', auto_now_add=True)
     status                  = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")

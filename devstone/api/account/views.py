@@ -27,7 +27,8 @@ from api.permissions import (
     IsCustomerService,
     IsBakery
 )
-from api.account.serializers import AccountDetailSerializer,UserSerializer,OrderedItemSerializer,CartListSerializer,OrderListSerializer
+from api.account.serializers import AccountDetailSerializer,UserSerializer,OrderedItemSerializer
+from api.serializers import CartListSerializer, OrderListSerializer
 from accounts.models import Account,Order,Cart,OrderedItem
 from products.models import ProductDetail
 
