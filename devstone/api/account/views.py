@@ -27,9 +27,9 @@ from api.permissions import (
     IsCustomerService,
     IsBakery
 )
-from api.account.serializers import AccountDetailSerializer,UserSerializer,OrderedItemSerializer
-from api.serializers import CartListSerializer, OrderListSerializer
-from accounts.models import Account,Order,Cart,OrderedItem
+from api.account.serializers import AccountDetailSerializer,UserSerializer
+
+from accounts.models import Account
 from products.models import ProductDetail
 
 class FacebookLogin(SocialLoginView):
@@ -62,27 +62,6 @@ class AuthInfoUpdateView(GenericAPIView):
             serializer.update(usermail=request.user.email)
             return Response({"message":"Profile succesfully update"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def CartDetail(request,pk):
-    try:
-        cart        = Cart.objects.get(id=pk)
-        queryset    = OrderedItem.objects.filter(cart=cart)
-    except Cart.DoesNotExist:
-        data            = {'detail':'Cart does not exist'}
-        return Response(data)
-
-    cart                = Cart.objects.filter(id=pk)
-
-    cartSerializer      = CartListSerializer(cart,many=True)
-    oProductsSerializer = OrderedItemSerializer(queryset,many=True)
-
-    responsibleData = {}
-    responsibleData['cart']             =  cartSerializer.data
-    responsibleData['ordered products'] =  oProductsSerializer.data
-
-    return Response(responsibleData)
 
         
 

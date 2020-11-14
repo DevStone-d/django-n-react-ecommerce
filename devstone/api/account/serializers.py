@@ -1,16 +1,6 @@
 from rest_framework import serializers
-from accounts.models import Account,OrderedItem
+from accounts.models import Account
 from rest_auth.serializers import UserDetailsSerializer
-
-class OrderedItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderedItem
-        fields = [
-            'id', 
-            'cart', 
-            'item',
-            'quantity',
-            ]
 
 class AccountDetailSerializer(serializers.ModelSerializer):
     class Meta:

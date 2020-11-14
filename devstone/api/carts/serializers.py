@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import Cart,Order
+from cart.models import Cart,Order,OrderedItem
 from rest_auth.serializers import UserDetailsSerializer
 
 class OrderListSerializer(serializers.ModelSerializer):
@@ -22,4 +22,14 @@ class CartListSerializer(serializers.ModelSerializer):
             'customer',
             'ordered',
             'total',
+            ]
+
+class OrderedItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderedItem
+        fields = [
+            'id', 
+            'cart', 
+            'item',
+            'quantity',
             ]
