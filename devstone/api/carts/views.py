@@ -30,13 +30,14 @@ class OrderList(ListAPIView):
     permission_classes = [AllowAny]
 
 class AddToCart(APIView):
-    queryset = OrderedItem.objects.all()
-    lookup_field = 'pk'
-    permission_classes = [AllowAny]
-    serializer_class = OrderedItemSerializer
+    # queryset = OrderedItem.objects.all()
+    # lookup_field = 'pk'
+    # permission_classes = [AllowAny]
+    # serializer_class = OrderedItemSerializer
 
     def post(self,request,*args,**kwargs):
         productId = request.data.get('item',None)
+        #productId = request.data.get('slug',None) 
         #productId = lookup_field
         if productId is None:
             return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
@@ -52,12 +53,10 @@ class AddToCart(APIView):
             ordered_item.quantity = quantity
         else:
             ordered_item.quantity += quantity
-        print(cart.total)
         cart.total += item.price * quantity
-        print(cart.total)
         cart.save()
-        print(cart.total)
         return Response(status=HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
