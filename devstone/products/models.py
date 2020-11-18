@@ -66,7 +66,7 @@ class Product(models.Model):
         else :
             self.meta_desc = self.description
 
-        if self.slug is None:
+        if self.slug == "":
             self.slug = self.get_slug()
 
         return super(Product,self).save(*args,**kwargs)
