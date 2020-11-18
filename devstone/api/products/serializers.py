@@ -11,6 +11,7 @@ class ListProductsAPIView(serializers.ModelSerializer):
             'description',
             'video_url',
             'slug',
+            'thumbnail',
             'meta_desc',
             'is_active'
         ]
