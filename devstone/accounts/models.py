@@ -34,7 +34,6 @@ class MyAccountManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
-		
 
 class Account(AbstractBaseUser):
     username = None
