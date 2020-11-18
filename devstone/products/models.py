@@ -52,7 +52,7 @@ class Product(models.Model):
     #     return categories
 
     def get_slug(self):
-        slug = slugify(self.name)
+        slug = slugify(self.name.replace("ı","i"))
         unique = slug
         number = 1
         while Product.objects.filter(slug=unique).exists():

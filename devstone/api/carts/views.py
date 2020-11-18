@@ -53,10 +53,10 @@ class AddToCart(APIView):
             ordered_item.quantity = quantity
         else:
             ordered_item.quantity += quantity
+        ordered_item.save()
         cart.total += item.price * quantity
         cart.save()
         return Response(status=HTTP_200_OK)
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -65,8 +65,9 @@ def CartDetail(request,pk):
         cart        = Cart.objects.get(id=pk)
         queryset    = OrderedItem.objects.filter(cart=cart)
     except Cart.DoesNotExist:
-        data            = {'detail':'Cart does not exist'}
-        return Response(data)
+        # data            = {'detail':'Cart does not exist'}
+        # return Response(data)
+        return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
 
     cart                = Cart.objects.filter(id=pk)
 
@@ -78,3 +79,98 @@ def CartDetail(request,pk):
     responsibleData['ordered products'] =  oProductsSerializer.data
 
     return Response(responsibleData)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def clearCart(request,pk):
+    try:
+        cart        = Cart.objects.get(id=pk)
+        queryset    = OrderedItem.objects.filter(cart=cart)
+    except Cart.DoesNotExist:
+        data            = {'detail':'Cart does not exist'}
+        return Response(data)
+
+    cart                = Cart.objects.filter(id=pk)
+
+    # cart.delete()
+    # del cart
+    # cart.save()
+
+    return Response(status=HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def updateCart(request,pk):
+        try:
+            cart                = Cart.objects.get(id=pk)
+            queryset            = OrderedItem.objects.filter(cart=cart)
+        except Cart.DoesNotExist:
+            return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
+
+        cart                    = Cart.objects.filter(id=pk)
+        productId               = request.data.get('item',None)
+        if productId is None:
+            return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
+
+        item                    = get_object_or_404(ProductDetail,id=productId)
+        quantity                = int(request.data.get('quantity')) #input quantity
+
+        ordered_item            = OrderedItem.objects.get(cart=cart,item=item) # get the item
+        cart.total             -= item.price * ordered_item.quantity # cart'tan itemin ucretini cikariyoruz, yani item adetini 0'a indiriyoruz gibi bir sey
+        ordered_item.quantity   = quantity # item's new quantity
+        ordered_item.save()
+        cart.total             += item.price * quantity # add item's price * quantity to the cart total
+        cart.save()
+    
+        return Response(status=HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def plus1Cart(request,pk):
+        try:
+            cart                = Cart.objects.get(id=pk)
+            queryset            = OrderedItem.objects.filter(cart=cart)
+        except Cart.DoesNotExist:
+            return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
+
+        cart                    = Cart.objects.filter(id=pk)
+        productId               = request.data.get('item',None)
+        if productId is None:
+            return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
+
+        item                    = get_object_or_404(ProductDetail,id=productId)
+
+        ordered_item            = OrderedItem.objects.get(cart=cart,item=item) # get the item
+        ordered_item.quantity   += 1 # item's new quantity
+        ordered_item.save()
+        cart.total             += item.price # add item's price * quantity to the cart total
+        cart.save()
+    
+        return Response(status=HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def minus1Cart(request,pk):
+        try:
+            cart                = Cart.objects.get(id=pk)
+            queryset            = OrderedItem.objects.filter(cart=cart)
+        except Cart.DoesNotExist:
+            return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
+
+        cart                    = Cart.objects.filter(id=pk)
+        productId               = request.data.get('item',None)
+        if productId is None:
+            return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
+
+        item                    = get_object_or_404(ProductDetail,id=productId)
+
+        ordered_item            = OrderedItem.objects.get(cart=cart,item=item) # get the item
+        if ordered_item.quantity == 1:
+            ordered_item.delete()
+        else:
+            ordered_item.quantity   -= 1 # item's new quantity
+            ordered_item.save()
+        cart.total             -= item.price # add item's price * quantity to the cart total
+        cart.save()
+    
+        return Response(status=HTTP_200_OK)
