@@ -12,12 +12,16 @@ from rest_framework.generics import (
     UpdateAPIView,
     RetrieveAPIView,
     GenericAPIView,
+    RetrieveUpdateDestroyAPIView,
 )
 
+from accounts.models import Account
 from cart.models import Order,Cart,OrderedItem
+from discounts.models import Coupon
 from products.models import ProductDetail
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from .serializers import CartListSerializer,OrderListSerializer,OrderedItemSerializer
+from .serializers import CartListSerializer,OrderListSerializer,OrderedItemSerializer,CouponSerializer
+from rest_framework import status
 
 # Create your views here.
 class CartList(ListAPIView):
@@ -31,10 +35,10 @@ class OrderList(ListAPIView):
     permission_classes = [AllowAny]
 
 class AddToCart(APIView):
-    # queryset = OrderedItem.objects.all()
-    # lookup_field = 'pk'
-    # permission_classes = [AllowAny]
-    # serializer_class = OrderedItemSerializer
+    queryset = OrderedItem.objects.all()
+    lookup_field = 'pk'
+    permission_classes = [AllowAny]
+    serializer_class = OrderedItemSerializer
 
     def post(self,request,*args,**kwargs):
         productId = request.data.get('item',None)
@@ -43,21 +47,44 @@ class AddToCart(APIView):
         if productId is None:
             return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
         item = get_object_or_404(ProductDetail,id=productId)
+        user = Account.objects.get(id=request.user.id)
 
-        cart, created = Cart.objects.get_or_create(customer=request.user.id,ordered=False)
-
+        cart, created = Cart.objects.get_or_create(customer=user,ordered=False)            
         quantity = int(request.data.get('quantity'))
 
         #if object is already in the cart
-        ordered_item, created_oitem = OrderedItem.objects.get_or_create(cart=cart,item=item,quantity=quantity)
-        if created_oitem:
-            ordered_item.quantity = quantity
-        else:
+        # ordered_item, created_oitem = OrderedItem.objects.get_or_create(cart=cart,item=item,quantity=quantity)
+        try:
+            ordered_item = OrderedItem.objects.get(cart=cart,item=item)
             ordered_item.quantity += quantity
+        except OrderedItem.DoesNotExist:
+            ordered_item = OrderedItem(cart=cart,item=item,quantity=quantity)
         ordered_item.save()
         cart.total += item.price * quantity
+        cart.discounted = cart.total ##
         cart.save()
         return Response(status=HTTP_200_OK)
+
+class updateCart(RetrieveUpdateDestroyAPIView):
+    queryset = OrderedItem.objects.all()
+    lookup_field = 'pk'
+    permission_classes = [AllowAny]
+    serializer_class = OrderedItemSerializer
+
+class addCoupon(RetrieveUpdateDestroyAPIView):
+    queryset = Cart.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = CouponSerializer
+    lookup_field = 'pk'
+
+    def put(self, request, *args, **kwargs):
+        serializer = CouponSerializer(data=request.data)
+        if serializer.is_valid(request.data.get('id'),request.data.get('coupon'),request.user):
+            serializer.update(request.data.get('id'))
+            return Response({"message":"Coupon succesfully added"})
+        else:
+            return Response({"message":"ERROR"},status=status.HTTP_400_BAD_REQUEST)
+            #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -95,7 +122,7 @@ def clearCart(request,pk):
 
     cart                = Cart.objects.filter(id=pk)
 
-    # cart.delete()
+    cart.delete()
     # del cart
     # cart.save()
 
@@ -103,84 +130,57 @@ def clearCart(request,pk):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def updateCart(request,pk):
+def addaaaCoupon(request,code,pk):
     try:
         cart                = Cart.objects.get(id=pk)
         queryset            = OrderedItem.objects.filter(cart=cart)
     except Cart.DoesNotExist:
-        # return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
         raise Http404("Cart does not exist")
     cart                    = Cart.objects.filter(id=pk)
-    productId               = request.data.get('item',None)
-    if productId is None:
-        # return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
-        raise Http404("Invalid request")
-    item                    = get_object_or_404(ProductDetail,id=productId)
-    quantity                = int(request.data.get('quantity')) #input quantity
-    ordered_item            = OrderedItem.objects.get(cart=cart,item=item) # get the item
-    cart.total             -= item.price * ordered_item.quantity # cart'tan itemin ucretini cikariyoruz, yani item adetini 0'a indiriyoruz gibi bir sey
-    ordered_item.quantity   = quantity # item's new quantity
-    ordered_item.save()
-    cart.total             += item.price * quantity # add item's price * quantity to the cart total
-    cart.save()
-
-    return Response(status=HTTP_200_OK)
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def plus1Cart(request,pk):
-    try:
-        cart                = Cart.objects.get(id=pk)
-        queryset            = OrderedItem.objects.filter(cart=cart)
-    except Cart.DoesNotExist:
-        # return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
-        raise Http404("Cart does not exist")
-        
-    cart                    = Cart.objects.filter(id=pk)
-    productId               = request.data.get('item',None)
-    if productId is None:
-        # return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
-        raise Http404("Invalid request")
-    item                    = get_object_or_404(ProductDetail,id=productId)
-    ordered_item            = OrderedItem.objects.get(cart=cart,item=item) # get the item
-    ordered_item.quantity   += 1 # item's new quantity
-    ordered_item.save()
-    cart.total             += item.price # add item's price * quantity to the cart total
-    cart.save()
-
-    return Response(status=HTTP_200_OK)
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def minus1Cart(request,pk):
-    try:
-        cart                = Cart.objects.get(id=pk)
-        queryset            = OrderedItem.objects.filter(cart=cart)
-    except Cart.DoesNotExist:
-        # return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
-        raise Http404("Cart does not exist")
-    cart                    = Cart.objects.filter(id=pk)
-    productId               = request.data.get('item',None)
-    if productId is None:
-        # return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
-        raise Http404("Invalid request")
-    item                    = get_object_or_404(ProductDetail,id=productId)
-    ordered_item            = OrderedItem.objects.get(cart=cart,item=item) # get the item
-    if ordered_item.quantity == 1:
-        ordered_item.delete()
+    cart.discounted = cart.total ##
+    coupon = Coupon.objects.get_object_or_404(code=code)
+    if coupon.customer is not None:
+        if (request.user.id != coupon.customer.id):
+            raise Http404("Coupon is not valid")
+    if coupon.cart is not None:
+        if (cart.id != coupon.cart.id):
+            raise Http404("Coupon is not valid")
+    if coupon.product is not None:
+        items = OrderedItemSerializer(queryset,many=True).data
+        item = 0
+        for i in items:
+            if (i.id == coupon.product.id):
+                item = i
+        if item == 0:
+            raise Http404("Coupon is not valid")
+      
+    if coupon.coupon_type == '-1':
+        raise Http404("Coupon is not valid")
+    elif coupon.coupon_type == '0':
+        cart.discounted -= cart.discounted/100*coupon.amount
+        cart.save()
+    elif coupon.coupon_type == '1':
+        cart.discounted -= coupon.amount
+        cart.save()
+    elif coupon.coupon_type == '2':
+        if cart.discounted >= coupon.above:
+            cart.discounted = cart.discounted/100*coupon.amount
+            cart.save()
+        else:
+            raise Http404("Coupon is not valid") #
+    elif coupon.coupon_type == '3':
+        if cart.discounted >= coupon.above:
+            cart.discounted -= coupon.amount
+            cart.save()
+    elif coupon.coupon_type == 'p':
+        cart.discounted -= (item.item.price - coupon.amount) * item.quantity
+        cart.save()
     else:
-        ordered_item.quantity   -= 1 # item's new quantity
-        ordered_item.save()
-    cart.total             -= item.price # add item's price * quantity to the cart total
-    cart.save()
+        raise Http404("Coupon is not valid")
 
-    return Response(status=HTTP_200_OK)
-
-def addCoupon(request,code,pk):
-    try:
-        cart                = Cart.objects.get(id=pk)
-        queryset            = OrderedItem.objects.filter(cart=cart)
-    except Cart.DoesNotExist:
-        # return Response({"message":"Cart does not exist"},status=HTTP_400_BAD_REQUEST)
-        raise Http404("Cart does not exist")
-    cart                    = Cart.objects.filter(id=pk)
+    # if cart.total != cart.discounted:
+    #     coupon.limited -=1
+    #     if coupon.limited == 0:
+    #         coupon.is_active = 0
+    #         coupon.delete()
+    #     coupon.save()

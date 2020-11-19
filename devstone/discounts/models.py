@@ -1,7 +1,6 @@
 from django.db import models
 from accounts.models import Account
 from products.models import Product
-from cart.models import Cart
 # Create your models here.
 
 class Coupon(models.Model):
@@ -11,14 +10,21 @@ class Coupon(models.Model):
         ('1','direct'),
         ('2','directAbove'),
         ('3','percentageAbove'),
-    ]
-    customer = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="related user",blank=True, null=True)
-    product  = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="related product",blank=True,null=True)
-    cart     = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="related cart",blank=True, null=True)
 
+        # ('4','userBasedDirect'),
+        # ('5','userBasedDirectAbove'),  -LIMITED = 1
+        # ('6','userBasedPer'),
+        # ('7','userBasedPerAbove'),
+    ]
+    customer = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="related_user",blank=True, null=True)
+   
     valid_until = models.DateTimeField()
     coupon_type = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")
+    amount = models.IntegerField()
+    above = models.IntegerField(blank=True,null=True)
     code = models.CharField(max_length=50)
+    is_active = models.BooleanField()
+    limited = models.IntegerField()
 
     def __str__(self):
-        return self.code + str(self.STATUS_MEANS[self.coupon_type])
+        return self.code

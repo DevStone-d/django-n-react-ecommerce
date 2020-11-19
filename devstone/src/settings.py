@@ -33,6 +33,7 @@ AUTH_USER_MODEL = 'accounts.Account'
 SITE_ID=1
 INSTALLED_APPS = [
     ##my apps
+    'discounts',
     'accounts',
     'api',
     'products',

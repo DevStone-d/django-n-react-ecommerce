@@ -1,14 +1,17 @@
 from django.db import models
 from accounts.models import Account, Adress
 from products.models import ProductDetail
+from discounts.models import Coupon
 from django.utils import timezone
+
 # Create your models here.
 
 class Cart(models.Model):
     customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
     ordered                 = models.BooleanField(default=0,editable=False)
     total                   = models.FloatField(editable=False,default=0.0)
-    # discount                = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
+    discounted              = models.FloatField(editable=False,default=0.0) ##
+    coupon                  = models.CharField(max_length=50,blank=True,null=True)
 
     def check_amount(self,req_amount):
         total = 0.0
@@ -21,6 +24,8 @@ class Cart(models.Model):
         if (req_amount == total) and (self.amount == req_amount) :
             return True
         return False
+    def __str__(self):
+        return self.customer.first_name +" "+ self.customer.first_name + "'s Cart"
 #sepetim'e gidilince quantity-> +1/-1 olabilir ya da quantity direkt guncellenebilir
 
 class OrderedItem(models.Model):
@@ -30,7 +35,7 @@ class OrderedItem(models.Model):
     # item_total      = item.all.price()
 
     def __str__(self):
-        return f"{self.cart.customer} added {self.item} to the cart : {self.cart.id}"
+        return f"{self.cart.customer} added {self.item} to the cart : {self.cart.id}, id: {self.id}"
 
 class Order(models.Model):
     STATUS_MEANS = [
