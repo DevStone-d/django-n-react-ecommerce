@@ -23,12 +23,12 @@ Django and React E-commerce project
     * rest-auth/
         * registration
 
-3.api-auth/
-    a.login
-    b.logout
+3. api-auth/
+    * login
+    * logout
 
-all = [
-    admin
+
+## ALL API ENDPOINTS
 
     api/collections
     api/collections/add
@@ -50,15 +50,15 @@ all = [
 
     api-auth/login
     api-auth/logout
-]
+
 
 
 kargoya verilmeden adres degisikligi talebi olusturulabilir
 giftboy.com hediyecim.com - online hediye gonderimi, steam code, vouchers, trendyol, zara alisveris karti
 
-requirements = [
-###   API
-    ##ADMIN CALLS
+
+# Requirements API Calls 
+### ADMIN CALLS
     api/products/delete/detail/<int:pk> -> delete the product's detail      OK
     api/products/edit/<slug>                                                OK
     api/products/edit/detail/<int:pk>                                       OK
@@ -66,14 +66,14 @@ requirements = [
 
     THESE FUTURE APIs MUST BE HAVE MODELS
     
-    ##USER CALLS
+###  USER CALLS
     api/cart -> user_token, cart.is_active
     api/cart/add
     api/cart/delete/<int:pk> -> delete one item
     api/cart/all/delete -> delete whole items from cart
     #3 gun sepet aktif, guest alisveris, sepette urunleriniz kaldi maili,odeme ekranina gelmeden bilgilerini alalim arka planda uyelik olussun
 
-    ##ADMIN CALLS -> admin auth
+###  ADMIN CALLS
     api/campaigns
     api/campaigns/public -> allow any
     api/campaigns/detail/<int:pk> -> user auth
@@ -84,14 +84,14 @@ requirements = [
     api/campaigns/enable/<int:pk>
     api/campaigns/delete/<int:pk>
     
-    ##ADMIN CALLS -> admin auth
+### ADMIN CALLS
     api/reviews
     api/reviews/all/<slug> -> Spesific Product's all reviews -> allow any
     api/reviews/<int:pk> -> Spesific User's all reviews
     api/reviews/<int:pk>/product/<slug> -> Spesific user's reviews on a specific product
     api/reviews/delete/<int:pk>
 
-    ##USER CALLS -> user auth
+### USER CALLS
     api/account/reviews
     api/account/reviews/add/<slug>
     api/account/reviews/edit/<int:pk>
@@ -109,15 +109,11 @@ requirements = [
     api/account/collections/detail/<slug> -> allow any
     api/account/collections/detail/<slug>/product/add -> user auth, input: product 
     api/account/collections/detail/<slug>/product/delete -> user auth
-
-    #Bunu da satin
-    #arama sonrasi sonuc yok
-    #arama gecmisi
     
-    ##ADMIN CALLS
+### ADMIN CALLS
     api/site/log
 
-### PERMS
+## PERMS
     is_store
     is_delivery
     is_burhan
@@ -128,5 +124,6 @@ requirements = [
     is_bakery
 
 
-
-]
+- Bunu da satin
+- arama sonrasi sonuc yok
+- arama gecmisi
