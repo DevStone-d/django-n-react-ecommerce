@@ -3,25 +3,25 @@ Django and React E-commerce project
 
 ## API ENDPOINTS
 
-1.admin -> 256-bit key (g5as5kh6hv2jh5o8u4j5rtegd1) gibi
+1. admin -> 256-bit key (g5as5kh6hv2jh5o8u4j5rtegd1) gibi
 
-2.api/
-    a.collections/
-        -add
-        -delete/<slug>
-        -detail/<slug>
-    b.products/
-        -add
-        -add/detail/<int:pk>
-        -detail/<int:pk>
-        -tag
-        -tag/<slug>
-        -status/<slug>
-    c.account/
-        -profile
-        -editprofile
-    d.rest-auth/
-        -registration
+2. api/
+    * collections/
+        * add
+        * delete/<slug>
+        * detail/<slug>
+    * products/
+        * add
+        * add/detail/<int:pk>
+        * detail/<int:pk>
+        * tag
+        * tag/<slug>
+        * status/<slug>
+    * account/
+        * profile
+        * editprofile
+    * rest-auth/
+        * registration
 
 3.api-auth/
     a.login
