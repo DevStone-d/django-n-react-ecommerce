@@ -17,7 +17,8 @@ from api.products.serializers import (
                                         ListProductDetailAPIView,
                                         ListProductMediaAPIView,
                                         ListProductTagAPIView, 
-                                        ProductStatusAPIView
+                                        ProductStatusAPIView,
+                                        DetailProductAPIView
                                         )
 
 #models
@@ -39,7 +40,14 @@ class addProduct(ListCreateAPIView):
     serializer_class = ListProductsAPIView
     permission_classes = [IsEditor,IsAdminUser]
     queryset = Product.objects.all()
-    
+
+class getProductDetail(ListAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    serializer_class = DetailProductAPIView
+    permission_classes = [AllowAny]
+    lookup_field = "id"
+    queryset = Product.objects.all()
+
 
 @api_view(['POST','GET'])
 @permission_classes([IsEditor,IsAdminUser])
@@ -103,32 +111,6 @@ def addProductDetail(request,pk):
             return Response(data)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def productDetail(request,pk):
-    try:
-        xproduct        = Product.objects.filter(id=pk)
-        product         = Product.objects.get(id=pk)
-    except Product.DoesNotExist:
-        data            = {'detail':'Product does not exist'}
-        return Response(data)
-
-    productDetail       = ProductDetail.objects.filter(product=product)
-    productMedia        = ProductMedia.objects.filter(product=product)
-    productTag          = Tag.objects.filter(product=product)
-
-    productSeri         = ListProductsAPIView(xproduct,many=True)
-    productDetailSeri   = ListProductDetailAPIView(productDetail,many=True)
-    productMediaSeri    = ListProductMediaAPIView(productMedia,many=True)
-    productTagSeri      = ListProductTagAPIView(productTag,many=True)
-
-    responsibleData = {}
-    responsibleData['product'] = productSeri.data
-    responsibleData['variants'] = productDetailSeri.data
-    responsibleData['medias'] = productMediaSeri.data
-    responsibleData['tags']   = productTagSeri.data
-
-    return Response(responsibleData)
 
 class ProductStatus(RetrieveUpdateAPIView):
     permission_classes = [IsAdminUser]
@@ -141,7 +123,6 @@ class ProductStatus(RetrieveUpdateAPIView):
 class ProductList(ListAPIView):
     queryset = Product.objects.all()
     permission_classes = [AllowAny]
-
     serializer_class = ListProductsAPIView
 
 class ProductsTagList(ListAPIView):

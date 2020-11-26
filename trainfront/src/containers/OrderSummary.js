@@ -67,11 +67,11 @@ class OrderSummary extends React.Component {
     });
   };
 
-  handleAddToCart = (slug, itemVariations) => {
+  handleAddToCart = ( itemVariations) => {
     this.setState({ loading: true });
     const variations = this.handleFormatData(itemVariations);
     authAxios
-      .post(addToCartURL, { slug, variations })
+      .post(addToCartURL, {  variations })
       .then(res => {
         this.handleFetchOrder();
         this.setState({ loading: false });
@@ -166,19 +166,18 @@ class OrderSummary extends React.Component {
                         style={{ float: "right", cursor: "pointer" }}
                         onClick={() =>
                           this.handleAddToCart(
-                            orderItem.item.slug,
-                            orderItem.item_variations
+                            orderItem.id
                           )
                         }
                       />
                     </Table.Cell>
                     <Table.Cell>
-                      {orderItem.item.discount_price && (
+                      {orderItem.item.first_price !== -1 && (
                         <Label color="green" ribbon>
                           ON DISCOUNT
                         </Label>
                       )}
-                      ${orderItem.final_price}
+                      ${orderItem.price}
                       <Icon
                         name="trash"
                         color="red"

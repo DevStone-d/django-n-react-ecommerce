@@ -52,7 +52,7 @@ class ProductDetail extends React.Component {
     axios
       .get(productDetailURL(params.productID))
       .then(res => {
-        this.setState({ data: res.data, loading: false });
+        this.setState({ data: res.data[0], loading: false });
       })
       .catch(err => {
         this.setState({ error: err, loading: false });
@@ -66,12 +66,12 @@ class ProductDetail extends React.Component {
     });
   };
 
-  handleAddToCart = slug => {
+  handleAddToCart = () => {
     this.setState({ loading: true });
-    const { formData } = this.state;
+    const { formData } = this.state.data;
     const variations = this.handleFormatData(formData);
     authAxios
-      .post(addToCartURL, { slug, variations })
+      .post(addToCartURL, { variations })
       .then(res => {
         this.props.refreshCart();
         this.setState({ loading: false });
@@ -94,6 +94,7 @@ class ProductDetail extends React.Component {
     const { data, error, formData, formVisible, loading } = this.state;
     const item = data;
     return (
+   
       <Container>
         {error && (
           <Message
@@ -115,24 +116,14 @@ class ProductDetail extends React.Component {
             <Grid.Column>
               <Card
                 fluid
-                image={item.image}
-                header={item.title}
+                image={item.thumbnail}
+                header={item.name}
                 meta={
                   <React.Fragment>
                     {item.category}
-                    {item.discount_price && (
-                      <Label
-                        color={
-                          item.label === "primary"
-                            ? "blue"
-                            : item.label === "secondary"
-                            ? "green"
-                            : "olive"
-                        }
-                      >
-                        {item.label}
+                      <Label color="green">
+                        {}
                       </Label>
-                    )}
                   </React.Fragment>
                 }
                 description={item.description}
@@ -155,53 +146,46 @@ class ProductDetail extends React.Component {
               {formVisible && (
                 <React.Fragment>
                   <Divider />
-                  <Form onSubmit={() => this.handleAddToCart(item.slug)}>
-                    {data.variations.map(v => {
-                      const name = v.name.toLowerCase();
-                      return (
-                        <Form.Field key={v.id}>
+                  <Form onSubmit={() => this.handleAddToCart}>
+                        <Form.Field>
                           <Select
-                            name={name}
                             onChange={this.handleChange}
-                            placeholder={`Select a ${name}`}
+                            placeholder={`Select a variant`}
                             fluid
                             selection
-                            options={v.item_variations.map(item => {
+                            options={data.variants.map(item => {
                               return {
                                 key: item.id,
-                                text: item.value,
+                                text: item.__str__,
                                 value: item.id
                               };
                             })}
-                            value={formData[name]}
+                            value={formData["0"]}
                           />
                         </Form.Field>
-                      );
-                    })}
                     <Form.Button primary>Add</Form.Button>
                   </Form>
                 </React.Fragment>
               )}
             </Grid.Column>
-            <Grid.Column>
+            {/* <Grid.Column>
               <Header as="h2">Try different variations</Header>
-              {data.variations &&
-                data.variations.map(v => {
+              {data.variants.map(v => {
                   return (
                     <React.Fragment key={v.id}>
-                      <Header as="h3">{v.name}</Header>
+                      <Header as="h3">{v.__str__}</Header>
                       <Item.Group divided>
-                        {v.item_variations.map(iv => {
+                        {data.variants.map(iv => {
                           return (
                             <Item key={iv.id}>
-                              {iv.attachment && (
+                              {iv.thumbnail && (
                                 <Item.Image
                                   size="tiny"
-                                  src={`http://127.0.0.1:8000${iv.attachment}`}
+                                  src={iv.thumbnail}
                                 />
                               )}
                               <Item.Content verticalAlign="middle">
-                                {iv.value}
+                                {iv.price}
                               </Item.Content>
                             </Item>
                           );
@@ -210,7 +194,7 @@ class ProductDetail extends React.Component {
                     </React.Fragment>
                   );
                 })}
-            </Grid.Column>
+            </Grid.Column> */}
           </Grid.Row>
         </Grid>
       </Container>

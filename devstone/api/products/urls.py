@@ -2,19 +2,19 @@ from django.urls import path,include
 
 from api.products.views import (ProductList,
                                 ProductsTagList,
-                                productDetail,
                                 addProduct,
                                 addProductDetail,
                                 ProductsMediaList,
                                 ProductStatus,
                                 DeleteProductDetail,
                                 EditProduct,
-                                EditProductDetail
+                                EditProductDetail,
+                                getProductDetail,
                                 )
 
 urlpatterns = [
     path('' ,  ProductList.as_view()  ,  name='products'),
-    path('detail/<int:pk>/', productDetail , name='product detail'),
+    path('detail/<int:id>/', getProductDetail.as_view() , name='product detail'),
     path('add/', addProduct.as_view() , name='add product'),
     path('add/detail/<int:pk>/', addProductDetail , name='add product'),
     path('status/<slug>/', ProductStatus.as_view() , name='product status'),

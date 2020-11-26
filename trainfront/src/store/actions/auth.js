@@ -41,8 +41,9 @@ export const authLogin = (username, password) => {
   return dispatch => {
     dispatch(authStart());
     axios
-      .post("http://127.0.0.1:8000/rest-auth/login/", {
-        username: username,
+      .post("http://192.168.1.10:8000/api/rest-auth/login/", {
+        username:"",
+        email: username,
         password: password
       })
       .then(res => {

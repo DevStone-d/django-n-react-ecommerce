@@ -9,7 +9,9 @@ import {
   Label,
   Loader,
   Message,
-  Segment
+  Segment,
+  Button,
+  Icon
 } from "semantic-ui-react";
 import { productListURL, addToCartURL } from "../constants";
 import { fetchCart } from "../store/actions/cart";
@@ -72,7 +74,7 @@ class ProductList extends React.Component {
           {data.map(item => {
             return (
               <Item key={item.id}>
-                <Item.Image src={item.image} />
+                <Item.Image src={item.thumbnail} />
                 <Item.Content>
                   <Item.Header
                     as="a"
@@ -80,34 +82,28 @@ class ProductList extends React.Component {
                       this.props.history.push(`/products/${item.id}`)
                     }
                   >
-                    {item.title}
+                    {item.name}
                   </Item.Header>
                   <Item.Meta>
                     <span className="cinema">{item.category}</span>
                   </Item.Meta>
                   <Item.Description>{item.description}</Item.Description>
                   <Item.Extra>
-                    {/* <Button
+                    <Button
                       primary
                       floated="right"
                       icon
                       labelPosition="right"
-                      onClick={() => this.handleAddToCart(item.slug)}
+                      onClick={() => this.handleAddToCart(item.id)}
                     >
                       Add to cart
                       <Icon name="cart plus" />
-                    </Button> */}
-                    {item.discount_price && (
+                    </Button>
+                    {item.first_price && (
                       <Label
-                        color={
-                          item.label === "primary"
-                            ? "blue"
-                            : item.label === "secondary"
-                            ? "green"
-                            : "olive"
-                        }
+                        color="primary"
                       >
-                        {item.label}
+                        Discounted
                       </Label>
                     )}
                   </Item.Extra>

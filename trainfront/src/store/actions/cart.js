@@ -28,6 +28,7 @@ export const fetchCart = () => {
     authAxios
       .get(orderSummaryURL)
       .then(res => {
+        console.log(res.data.order_items.length)
         dispatch(cartSuccess(res.data));
       })
       .catch(err => {

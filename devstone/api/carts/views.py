@@ -19,8 +19,9 @@ from accounts.models import Account
 from cart.models import Order,Cart,OrderedItem
 from discounts.models import Coupon
 from products.models import ProductDetail
+from rest_framework.authentication import TokenAuthentication,SessionAuthentication,BasicAuthentication
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from .serializers import CartListSerializer,OrderListSerializer,OrderedItemSerializer,CouponSerializer
+from .serializers import CartListSerializer,OrderListSerializer,OrderedItemSerializer,CouponSerializer,CartDetailSerializer
 from rest_framework import status
 
 # Create your views here.
@@ -49,8 +50,10 @@ class AddToCart(APIView):
         item = get_object_or_404(ProductDetail,id=productId)
         user = Account.objects.get(id=request.user.id)
 
-        cart, created = Cart.objects.get_or_create(customer=user,ordered=False)            
-        quantity = int(request.data.get('quantity'))
+        cart, created = Cart.objects.get_or_create(customer=user,ordered=False)       
+        cart.save()     
+        # quantity = int(request.data.get('quantity'))
+        quantity = 1
 
         #if object is already in the cart
         # ordered_item, created_oitem = OrderedItem.objects.get_or_create(cart=cart,item=item,quantity=quantity)
@@ -85,6 +88,19 @@ class addCoupon(RetrieveUpdateDestroyAPIView):
         else:
             return Response({"message":"ERROR"},status=status.HTTP_400_BAD_REQUEST)
             #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class userCart(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CartDetailSerializer
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Cart.objects.filter(customer=user,ordered=False)
+        return queryset
+
+
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

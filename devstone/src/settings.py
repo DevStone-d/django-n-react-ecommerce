@@ -26,6 +26,9 @@ SECRET_KEY = 'kqt7945#bh@fg@niezz0@eh&n026i*(2nz4pe28!1bfitkzyak'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS.append("192.168.1.10")
+ALLOWED_HOSTS.append("0.0.0.0")
+ALLOWED_HOSTS.append("localhost")
 
 AUTH_USER_MODEL = 'accounts.Account'
 # Application definition
@@ -64,6 +67,11 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ]
 }
 

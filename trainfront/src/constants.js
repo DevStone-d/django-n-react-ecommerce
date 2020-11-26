@@ -1,13 +1,13 @@
-const localhost = "http://localhost:8000";
+const localhost = "http://192.168.1.10:8000";
 
 const apiURL = "/api";
 
 export const endpoint = `${localhost}${apiURL}`;
 
 export const productListURL = `${endpoint}/products/?format=json`;
-export const productDetailURL = id => `${endpoint}/products/${id}/`;
-export const addToCartURL = `${endpoint}/add-to-cart/`;
-export const orderSummaryURL = `${endpoint}/order-summary/`;
+export const productDetailURL = id => `${endpoint}/products/detail/${id}/`;
+export const addToCartURL = `${endpoint}/carts/add-to-cart/`;
+export const orderSummaryURL = `${endpoint}/carts/order-summary/`;
 export const checkoutURL = `${endpoint}/checkout/`;
 export const addCouponURL = `${endpoint}/add-coupon/`;
 export const countryListURL = `${endpoint}/countries/`;

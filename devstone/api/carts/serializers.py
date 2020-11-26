@@ -17,20 +17,6 @@ class OrderListSerializer(serializers.ModelSerializer):
             'status',
             'amount',
             ]
-
-class CartListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = [
-            'id', 
-            '__str__',
-            'customer',
-            'ordered',
-            'discounted',
-            'coupon',
-            'total',
-            ]
-
 class OrderedItemSerializer(serializers.ModelSerializer):
     order_items = serializers.SerializerMethodField()
     item_total = serializers.SerializerMethodField()
@@ -52,6 +38,40 @@ class OrderedItemSerializer(serializers.ModelSerializer):
         return mydick
     def get_item_total(self,obj):
         return obj.item.price * obj.quantity
+
+class CartDetailSerializer(serializers.ModelSerializer):
+    order_items = serializers.SerializerMethodField()
+    class Meta:
+        model = Cart
+        fields = [
+            'id', 
+            '__str__',
+            'customer',
+            'ordered',
+            'discounted',
+            'coupon',
+            'total',
+            'order_items'
+            ]
+
+    def get_order_items(self,obj):
+        queryset            = OrderedItem.objects.filter(cart=obj.id)
+        cartDetailSeri      = OrderedItemSerializer(queryset,many=True).data
+        return cartDetailSeri
+
+class CartListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = [
+            'id', 
+            '__str__',
+            'customer',
+            'ordered',
+            'discounted',
+            'coupon',
+            'total',
+            ]
+
 
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:
