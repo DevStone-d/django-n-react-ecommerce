@@ -29,6 +29,8 @@ ALLOWED_HOSTS = []
 ALLOWED_HOSTS.append("192.168.1.10")
 ALLOWED_HOSTS.append("0.0.0.0")
 ALLOWED_HOSTS.append("localhost")
+ALLOWED_HOSTS.append("127.0.0.1")
+
 
 AUTH_USER_MODEL = 'accounts.Account'
 # Application definition

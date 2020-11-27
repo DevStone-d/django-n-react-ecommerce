@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from products.models import Collection,Product
+from api.products.serializers import ListProductsAPIView
 
 class ListCollectionsAPIView(serializers.ModelSerializer):
     class Meta:
@@ -11,16 +12,20 @@ class ListCollectionsAPIView(serializers.ModelSerializer):
             'slug',
             'meta_desc'
         ]
-
-class ListCollectionDetailAPIView(serializers.ModelSerializer):
+class CollectionDetailAPIView(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
     class Meta:
-        model = Product
+        model = Collection
         fields = [
             'id',
-            'category',
             'name',
+            'img',
             'description',
-            'video_url',
             'slug',
-            'meta_desc'
+            'meta_desc',
+            'products'
         ]
+    def get_products(self,obj):
+        queryset            = Product.objects.filter(category=obj.id)
+        productsSerializer  = ListProductsAPIView(queryset,many=True).data
+        return productsSerializer

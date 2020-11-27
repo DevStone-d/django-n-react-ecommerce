@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view,permission_classes,authentication
 from rest_framework.authentication import SessionAuthentication,BasicAuthentication
 
 #our serializers
-from api.collections.serializers import ListCollectionsAPIView,ListCollectionDetailAPIView
+from api.collections.serializers import ListCollectionsAPIView,CollectionDetailAPIView
 
 #models
 from products.models import Collection, Product
@@ -30,6 +30,13 @@ class CollectionList(ListAPIView):
     serializer_class = ListCollectionsAPIView
     permission_classes = [AllowAny]
 
+class CollectionDetail(RetrieveAPIView):
+    permission_classes = [IsAdminUser]
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    serializer_class = CollectionDetailAPIView
+    queryset = Collection.objects.all()
+    lookup_field = 'slug'
+    
 class addCollection(ListCreateAPIView):
     permission_classes = [IsEditor,IsAdminUser]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
@@ -42,24 +49,3 @@ class deleteCollection(RetrieveDestroyAPIView):
     serializer_class = ListCollectionsAPIView
     queryset = Collection.objects.all()
     lookup_field = 'slug'
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def CollectionDetailList(request,slug):
-    try:
-        category = Collection.objects.get(slug=slug)
-        queryset = Product.objects.filter(category=category)
-    except Collection.DoesNotExist:
-        data            = {'detail':'Collection does not exist'}
-        return Response(data)
-
-    category = Collection.objects.filter(slug=slug)
-    categorySerializer = ListCollectionsAPIView(category,many=True)
-    productsSerializer = ListCollectionDetailAPIView(queryset,many=True)
-
-    responsibleData = {}
-    responsibleData['category'] =  categorySerializer.data
-    responsibleData['products'] =  productsSerializer.data
-
-    return Response(responsibleData)

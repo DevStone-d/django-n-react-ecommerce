@@ -20,7 +20,7 @@ from cart.models import Order,Cart,OrderedItem
 from discounts.models import Coupon
 from products.models import ProductDetail
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication,BasicAuthentication
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from .serializers import CartListSerializer,OrderListSerializer,OrderedItemSerializer,CouponSerializer,CartDetailSerializer
 from rest_framework import status
 
@@ -28,16 +28,15 @@ from rest_framework import status
 class CartList(ListAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
 class OrderList(ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
 class AddToCart(APIView):
     queryset = OrderedItem.objects.all()
-    lookup_field = 'pk'
     permission_classes = [AllowAny]
     serializer_class = OrderedItemSerializer
 
@@ -89,7 +88,6 @@ class addCoupon(RetrieveUpdateDestroyAPIView):
             return Response({"message":"ERROR"},status=status.HTTP_400_BAD_REQUEST)
             #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class userCart(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CartDetailSerializer
@@ -98,9 +96,6 @@ class userCart(ListAPIView):
         user = self.request.user
         queryset = Cart.objects.filter(customer=user,ordered=False)
         return queryset
-
-
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -143,60 +138,3 @@ def clearCart(request,pk):
     # cart.save()
 
     return Response(status=HTTP_200_OK)
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def addaaaCoupon(request,code,pk):
-    try:
-        cart                = Cart.objects.get(id=pk)
-        queryset            = OrderedItem.objects.filter(cart=cart)
-    except Cart.DoesNotExist:
-        raise Http404("Cart does not exist")
-    cart                    = Cart.objects.filter(id=pk)
-    cart.discounted = cart.total ##
-    coupon = Coupon.objects.get_object_or_404(code=code)
-    if coupon.customer is not None:
-        if (request.user.id != coupon.customer.id):
-            raise Http404("Coupon is not valid")
-    if coupon.cart is not None:
-        if (cart.id != coupon.cart.id):
-            raise Http404("Coupon is not valid")
-    if coupon.product is not None:
-        items = OrderedItemSerializer(queryset,many=True).data
-        item = 0
-        for i in items:
-            if (i.id == coupon.product.id):
-                item = i
-        if item == 0:
-            raise Http404("Coupon is not valid")
-      
-    if coupon.coupon_type == '-1':
-        raise Http404("Coupon is not valid")
-    elif coupon.coupon_type == '0':
-        cart.discounted -= cart.discounted/100*coupon.amount
-        cart.save()
-    elif coupon.coupon_type == '1':
-        cart.discounted -= coupon.amount
-        cart.save()
-    elif coupon.coupon_type == '2':
-        if cart.discounted >= coupon.above:
-            cart.discounted = cart.discounted/100*coupon.amount
-            cart.save()
-        else:
-            raise Http404("Coupon is not valid") #
-    elif coupon.coupon_type == '3':
-        if cart.discounted >= coupon.above:
-            cart.discounted -= coupon.amount
-            cart.save()
-    elif coupon.coupon_type == 'p':
-        cart.discounted -= (item.item.price - coupon.amount) * item.quantity
-        cart.save()
-    else:
-        raise Http404("Coupon is not valid")
-
-    # if cart.total != cart.discounted:
-    #     coupon.limited -=1
-    #     if coupon.limited == 0:
-    #         coupon.is_active = 0
-    #         coupon.delete()
-    #     coupon.save()
