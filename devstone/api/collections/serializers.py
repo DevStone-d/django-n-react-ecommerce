@@ -6,6 +6,7 @@ class ListCollectionsAPIView(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = [
+            'id',
             'name',
             'img',
             'description',

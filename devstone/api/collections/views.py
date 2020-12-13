@@ -9,7 +9,7 @@ from rest_framework.authentication import SessionAuthentication,BasicAuthenticat
 
 #our serializers
 from api.collections.serializers import ListCollectionsAPIView,CollectionDetailAPIView
-
+from api.products.serializers import DetailProductAPIView
 #models
 from products.models import Collection, Product
 
@@ -31,12 +31,39 @@ class CollectionList(ListAPIView):
     permission_classes = [AllowAny]
 
 class CollectionDetail(RetrieveAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     serializer_class = CollectionDetailAPIView
     queryset = Collection.objects.all()
     lookup_field = 'slug'
+
+class CollectionProductList(ListAPIView):
+    permission_classes = [AllowAny]
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    serializer_class = DetailProductAPIView
+    lookup_field = 'slug'
     
+    def get_queryset(self):
+        catSlug = self.kwargs['slug']
+        try:
+            xcat        = Collection.objects.filter(slug=catSlug)
+            cat         = Collection.objects.get(slug=catSlug)
+        except Product.DoesNotExist:
+            data            = {'detail':'Parent Product does not exist'}
+            return Response(data)
+        queryset            = Product.objects.filter(category=cat)
+
+
+        return queryset
+
+# class getProductDetail(ListAPIView):
+#     authentication_classes = [SessionAuthentication, BasicAuthentication]
+#     serializer_class = DetailProductAPIView
+#     permission_classes = [AllowAny]
+#     lookup_field = "id"
+#     queryset = Product.objects.all()
+
+
 class addCollection(ListCreateAPIView):
     permission_classes = [IsEditor,IsAdminUser]
     authentication_classes = [SessionAuthentication, BasicAuthentication]

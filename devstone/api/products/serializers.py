@@ -86,7 +86,6 @@ class DetailProductAPIView(serializers.ModelSerializer):
         queryset            = ProductMedia.objects.filter(product=obj.id)
         productMediaSeri    = ListProductMediaAPIView(queryset,many=True).data
         return productMediaSeri
-        
     def get_tags(self,obj):
         queryset            = Tag.objects.filter(product=obj.id)
         productTagSeri      = ListProductTagAPIView(queryset,many=True).data
@@ -100,14 +99,6 @@ class ProductStatusAPIView(serializers.ModelSerializer):
             'slug',
             'is_active'
         ]
-
-
-
-
-
-
-
-
 
 #     - kategori kampanyalari
 #     - urun kampanyalari
