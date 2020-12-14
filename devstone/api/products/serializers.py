@@ -35,6 +35,7 @@ class ListProductDetailAPIView(serializers.ModelSerializer):
         model = ProductDetail
         fields = [
             'id',
+            'product',
             '__str__',
             'first_price',
             'price',

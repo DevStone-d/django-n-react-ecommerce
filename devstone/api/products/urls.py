@@ -14,7 +14,7 @@ from api.products.views import (ProductList,
 
 urlpatterns = [
     path('' ,  ProductList.as_view()  ,  name='products'),
-    path('detail/<int:id>/', getProductDetail.as_view() , name='product detail'),
+    path('detail/<id>/', getProductDetail.as_view() , name='product detail'),
     path('add/', addProduct.as_view() , name='add product'),
     path('add/detail/<int:pk>/', addProductDetail , name='add product'),
     path('status/<slug>/', ProductStatus.as_view() , name='product status'),

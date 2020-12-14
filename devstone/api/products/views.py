@@ -41,24 +41,18 @@ class addProduct(ListCreateAPIView):
     permission_classes = [IsEditor,IsAdminUser]
     queryset = Product.objects.all()
 
-class getProductDetail(ListAPIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    serializer_class = DetailProductAPIView
-    permission_classes = [AllowAny]
-    lookup_field = "id"
-    
-    def get_queryset(self):
-        catSlug = self.kwargs['slug']
-        try:
-            xcat        = Collection.objects.filter(slug=catSlug)
-            cat         = Collection.objects.get(slug=catSlug)
-        except Product.DoesNotExist:
-            data            = {'detail':'Parent Product does not exist'}
-            return Response(data)
-        queryset            = Product.objects.filter(category=cat)
+class getProductDetail(RetrieveAPIView):
+    authentication_classes  = [SessionAuthentication, BasicAuthentication]
+    serializer_class        = DetailProductAPIView
+    permission_classes      = [AllowAny]
+    queryset                = Product.objects.all()
+    lookup_field            = 'id'
 
-
-        return queryset
+class getProductDetailList(ListAPIView):
+    authentication_classes  = [SessionAuthentication, BasicAuthentication]
+    serializer_class        = ListProductDetailAPIView
+    permission_classes      = [AllowAny]
+    queryset                = ProductDetail.objects.all()
 
 
 @api_view(['POST','GET'])
