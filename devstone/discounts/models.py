@@ -17,7 +17,6 @@ class Coupon(models.Model):
         # ('7','userBasedPerAbove'),
     ]
     customer = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="related_user",blank=True, null=True)
-   
     valid_until = models.DateTimeField()
     coupon_type = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")
     amount = models.IntegerField()

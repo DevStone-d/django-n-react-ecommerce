@@ -3,6 +3,7 @@ from . import views
 from .products.views import getProductDetailList
 
 urlpatterns = [
+    path('sitemap/', include('api.core.urls')),
     path('collections/',include('api.collections.urls')),
     path('allproductdetail/', getProductDetailList.as_view() , name='product detail'),
     path('account/', include('api.account.urls')),
