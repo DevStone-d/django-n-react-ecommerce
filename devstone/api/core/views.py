@@ -10,7 +10,7 @@ from rest_framework.authentication import SessionAuthentication,BasicAuthenticat
 #our serializers
 from products.models import Collection
 from core.models import Categories,SiteMapItem
-from api.core.serializers import DetailCollectionList,FullSiteMap
+from api.core.serializers import DetailCollectionList,SiteMapSerializer
 
 
 
@@ -19,21 +19,17 @@ class getList(ListAPIView):
     permission_classes      = [AllowAny]
     
     def get_queryset(self):
-        
         slug = self.kwargs['slug']
         if slug is not None:
-            
             try:
                 category            = Collection.objects.get(slug=slug)
                 queryset            = Categories.objects.all()
                 queryset = queryset.filter(parent=category.id)
             except:
                 queryset = Collection.objects.filter(slug=slug)
-            
-        
         return queryset
 
 class getFullSiteMap(ListAPIView):
-    serializer_class        = FullSiteMap
+    serializer_class        = SiteMapSerializer
     permission_classes      = [AllowAny]
-    queryset                = SiteMapItem.objects.filter(haveParent=False)
+    queryset                = SiteMapItem.objects.filter(haveParent=False).order_by("priority")

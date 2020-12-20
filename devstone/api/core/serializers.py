@@ -1,12 +1,11 @@
 from rest_framework import serializers
 
-from core.models import SiteMap,Categories,SiteMapItem
+from core.models import Categories,SiteMapItem
 
 from products.models import Collection
 
 
-
-class FullSiteMap(serializers.ModelSerializer):
+class SiteMapSerializer(serializers.ModelSerializer):
     submenus = serializers.SerializerMethodField()
     class Meta:
         model = SiteMapItem
@@ -15,41 +14,14 @@ class FullSiteMap(serializers.ModelSerializer):
             'title',
             'relationalModel',
             'url',
+            'haveParent',
             'submenus',
-            'haveChild',
-            'haveParent'
+            'priority'
         ]
     def get_submenus(self,obj):
-        childList = []
-        submenus = SiteMap.objects.filter(parentItem=obj.id)
-        for i in submenus:
-            currentChild = SiteMapItem.objects.get(id=i.childItem.id)
-            newDict = {
-                    'id'    : currentChild.id,
-                    'key'   : currentChild.relationalModel,
-                    'title' : currentChild.title,
-                    'url'   : currentChild.url,
-                    'haveChild': currentChild.haveChild,
-                    'haveParent':currentChild.haveParent
-                }
-            if currentChild.haveParent:
-                childList2 = []
-                submenus2 = SiteMap.objects.filter(parentItem=currentChild.id)
-                for j in submenus2:
-                    currentChild = SiteMapItem.objects.get(id=j.childItem.id)
-                    newDict2 = {
-                            'id'    : currentChild.id,
-                            'key'   : currentChild.relationalModel,
-                            'title' : currentChild.title,
-                            'url'   : currentChild.url,
-                            'haveChild': currentChild.haveChild,
-                            'haveParent':currentChild.haveParent,
-                            'submenus' : []
-                        }
-                    childList2.append(newDict2)
-                newDict['submenus'] = childList2
-            childList.append(newDict)
-        return childList
+        queryset  = SiteMapItem.objects.filter(parent=obj.id).order_by("priority")
+        serial    = SiteMapSerializer(queryset,many=True).data
+        return serial
     
 class DetailCollectionList(serializers.ModelSerializer):
     parent = serializers.SerializerMethodField()
