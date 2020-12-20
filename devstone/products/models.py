@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.expressions import OrderBy
 
 from django.utils.text import slugify
 
@@ -12,7 +13,7 @@ class Collection(models.Model):
     meta_desc       = models.CharField(max_length=144,editable=False)
 
     def get_slug(self):
-        slug = slugify(self.name)
+        slug   = slugify(self.name.replace("ı","i"))
         unique = slug
         number = 1
         while Collection.objects.filter(slug=unique).exists():
@@ -52,7 +53,7 @@ class Product(models.Model):
     #     return categories
 
     def get_slug(self):
-        slug = slugify(self.name.replace("ı","i"))
+        slug   = slugify(self.name.replace("ı","i"))
         unique = slug
         number = 1
         while Product.objects.filter(slug=unique).exists():
@@ -82,6 +83,7 @@ class ProductDetail(models.Model):
     variant         = models.CharField(max_length=50,blank=True,default=-1)
     variable        = models.CharField(max_length=50,blank=True,default=-1)
     thumbnail       = models.URLField()
+    totalOrder      = models.IntegerField(blank=True, null=True,editable=False)
 
     def __str__(self):
         return f"{self.variable} {self.product.name}"

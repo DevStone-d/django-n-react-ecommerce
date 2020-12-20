@@ -6,6 +6,7 @@ urlpatterns = [
     path('sitemap/', include('api.core.urls')),
     path('collections/',include('api.collections.urls')),
     path('allproductdetail/', getProductDetailList.as_view() , name='product detail'),
+    path('products/', include('api.products.urls')),
     path('account/', include('api.account.urls')),
     path('carts/',include('api.carts.urls')),
     path('rest-auth/', include('rest_auth.urls')),

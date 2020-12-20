@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 
-from rest_framework.generics import ListAPIView,RetrieveAPIView,ListCreateAPIView,DestroyAPIView,RetrieveDestroyAPIView
+from rest_framework.generics import ListAPIView,RetrieveAPIView,ListCreateAPIView,DestroyAPIView,RetrieveDestroyAPIView,CreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from rest_framework.decorators import api_view,permission_classes,authentication_classes
@@ -52,20 +52,10 @@ class CollectionProductList(ListAPIView):
             data            = {'detail':'Parent Product does not exist'}
             return Response(data)
         queryset            = Product.objects.filter(category=cat)
-
-
         return queryset
 
-# class getProductDetail(ListAPIView):
-#     authentication_classes = [SessionAuthentication, BasicAuthentication]
-#     serializer_class = DetailProductAPIView
-#     permission_classes = [AllowAny]
-#     lookup_field = "id"
-#     queryset = Product.objects.all()
-
-
-class addCollection(ListCreateAPIView):
-    permission_classes = [IsEditor,IsAdminUser]
+class addCollection(CreateAPIView):
+    permission_classes = [IsAdminUser]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     serializer_class = ListCollectionsAPIView
     queryset = Collection.objects.all()

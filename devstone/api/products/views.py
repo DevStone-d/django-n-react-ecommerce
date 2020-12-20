@@ -52,7 +52,7 @@ class getProductDetailList(ListAPIView):
     authentication_classes  = [SessionAuthentication, BasicAuthentication]
     serializer_class        = ListProductDetailAPIView
     permission_classes      = [AllowAny]
-    queryset                = ProductDetail.objects.all()
+    queryset                = ProductDetail.objects.all().order_by("totalOrder")
 
 
 @api_view(['POST','GET'])

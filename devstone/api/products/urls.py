@@ -10,6 +10,7 @@ from api.products.views import (ProductList,
                                 EditProduct,
                                 EditProductDetail,
                                 getProductDetail,
+                                getProductDetailList
                                 )
 
 urlpatterns = [
@@ -23,6 +24,8 @@ urlpatterns = [
     path('delete/detail/<int:pk>',DeleteProductDetail.as_view(),name='delete product detail'),
     path('edit/<slug>',EditProduct.as_view(),name='edit product'),
     path('edit/detail/<int:pk>',EditProductDetail.as_view(),name='edit product'),
+    path('variants/',getProductDetailList.as_view(),name='variants'),
+
 
 
 ]
