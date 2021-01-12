@@ -13,9 +13,9 @@ from rest_framework.generics import (
     GenericAPIView,
 )
 from rest_framework.viewsets import ModelViewSet
-# Create your views here.
-from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-from rest_auth.registration.views import SocialLoginView
+# # Create your views here.
+# from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+# from rest_auth.registration.views import SocialLoginView
 
 from api.permissions import (
     IsStore,
@@ -32,13 +32,6 @@ from api.account.serializers import AccountDetailSerializer,UserSerializer
 from accounts.models import Account
 from products.models import ProductDetail
 
-class FacebookLogin(SocialLoginView):
-    adapter_class = FacebookOAuth2Adapter
-
-@api_view(['GET',])
-def index(request):
-    return Response(status=status.HTTP_404_NOT_FOUND)
-
 @api_view(['GET',])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
@@ -47,15 +40,11 @@ def getProfile(request):
         user = request.user
         serializer = AccountDetailSerializer(user)
         return Response(serializer.data)
-
-
 class AuthInfoUpdateView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     serializer_class = UserSerializer
-    
     queryset = Account.objects.all()
-
     def put(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():

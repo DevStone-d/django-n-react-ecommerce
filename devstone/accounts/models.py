@@ -36,6 +36,12 @@ class MyAccountManager(BaseUserManager):
         return user
 
 class Account(AbstractBaseUser):
+    GENDER_TYPES = [
+        ('B','Belirtmek İstemiyorum'),
+        ('D','Diğer'),
+        ('K','Kadın'),
+        ('E','Erkek')
+    ]
     username = None
     email					= models.EmailField(verbose_name="email", max_length=60, unique=True)
     first_name              = models.CharField(max_length=200)
@@ -44,13 +50,7 @@ class Account(AbstractBaseUser):
     date_joined             = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login              = models.DateTimeField(verbose_name='last login', auto_now=True)
     date_of_birth           = models.DateField(verbose_name='birth date',blank=True,null=True)
-    """
-        Gender : 
-            -1: Belirtmek istemiyorum
-            0 : Erkek
-            1 : K 
-    """
-    gender                  = models.IntegerField(blank=True,null=True,default=-1)
+    gender                  = models.CharField(blank=True,null=True,default="B",choices=GENDER_TYPES,max_length=1)
     is_admin                = models.BooleanField(default=False)
     is_active               = models.BooleanField(default=True)
     is_superuser            = models.BooleanField(default=False)
