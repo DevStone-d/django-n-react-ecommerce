@@ -40,13 +40,14 @@ def getProfile(request):
         user = request.user
         serializer = AccountDetailSerializer(user)
         return Response(serializer.data)
+
 class AuthInfoUpdateView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = [SessionAuthentication, BasicAuthentication]
-    serializer_class = UserSerializer
+    serializer_class = AccountDetailSerializer
     queryset = Account.objects.all()
     def put(self, request, *args, **kwargs):
-        serializer = UserSerializer(data=request.data)
+        serializer = AccountDetailSerializer(data=request.data)
         if serializer.is_valid():
             serializer.update(usermail=request.user.email)
             return Response({"message":"Profile succesfully update"})

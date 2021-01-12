@@ -14,18 +14,6 @@ class AccountDetailSerializer(serializers.ModelSerializer):
             'date_of_birth',
             'gender',
             ]
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Account
-        fields = [
-            'first_name', 
-            'last_name',
-            'phone',
-            'date_of_birth',
-            'gender',
-            ]
-
     def update(self,usermail):
         account = Account.objects.get(email=usermail)
         
@@ -43,7 +31,19 @@ class UserSerializer(serializers.ModelSerializer):
         
         if self.validated_data['gender']:
             account.gender = self.validated_data['gender']
-        
+            
         account.save()
-
         return account
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = [
+            'first_name', 
+            'last_name',
+            'phone',
+            'date_of_birth',
+            'gender',
+            ]
+
+    
