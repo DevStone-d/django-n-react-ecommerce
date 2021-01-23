@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import Account
+from accounts.models import Account,Customer
 from rest_auth.serializers import UserDetailsSerializer
 
 class AccountDetailSerializer(serializers.ModelSerializer):
@@ -34,6 +34,13 @@ class AccountDetailSerializer(serializers.ModelSerializer):
             
         account.save()
         return account
+        
+class GuestCustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = [
+            'email',
+        ]
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

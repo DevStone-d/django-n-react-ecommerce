@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import Account, Adress
+from accounts.models import Account, Adress,Customer
 from products.models import ProductDetail
 from discounts.models import Coupon
 from django.utils import timezone
@@ -7,7 +7,7 @@ from django.utils import timezone
 # Create your models here.
 
 class Cart(models.Model):
-    customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
+    customer                = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="buyer")
     ordered                 = models.BooleanField(default=0,editable=False)
     total                   = models.FloatField(editable=False,default=0.0)
     discounted              = models.FloatField(editable=False,default=0.0) ##
@@ -25,7 +25,7 @@ class Cart(models.Model):
             return True
         return False
     def __str__(self):
-        return self.customer.first_name +" "+ self.customer.first_name + "'s Cart"
+        return self.customer.email + "'s Cart"
 #sepetim'e gidilince quantity-> +1/-1 olabilir ya da quantity direkt guncellenebilir
 
 class OrderedItem(models.Model):
@@ -52,21 +52,6 @@ class Order(models.Model):
     modified                = models.DateTimeField(verbose_name='date modified')
     status                  = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")
     amount                  = models.FloatField(editable=False,default=0.0)
-    #discount                = models.ForeignKey(Discount,on_delete=models.CASCADE,related_name="indirim",blank=True,null=True)
-
-    #customer                = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="buyer")
-    #ordered                 = models.BooleanField(default=0,editable=False)
-    # def check_amount(self,req_amount):
-    #     total = 0.0
-    #     items = OrderedItem.object.filter(cart = self.id)
-    #     for i in items:
-    #         total += (i.item.price * i.item.quantity)
-    #     print("requested amount= ",req_amount)
-    #     print("calculated total= ",total)
-    #     print("self.amount= ",self.amount)
-    #     if (req_amount == total) and (self.amount == req_amount) :
-    #         return True
-    #     return False
     def save(self, *args, **kwargs):
         if not self.id :
             self.created = timezone.now()

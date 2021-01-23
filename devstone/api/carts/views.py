@@ -7,21 +7,17 @@ from rest_framework.status import HTTP_400_BAD_REQUEST,HTTP_200_OK
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,authentication_classes,permission_classes
 from rest_framework.generics import (
-    DestroyAPIView,
-    ListAPIView,
-    UpdateAPIView,
-    RetrieveAPIView,
-    GenericAPIView,
+    CreateAPIView, ListAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 
-from accounts.models import Account
+from accounts.models import Account,Customer
 from cart.models import Order,Cart,OrderedItem
 from discounts.models import Coupon
 from products.models import ProductDetail
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication,BasicAuthentication
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
-from .serializers import CartListSerializer,OrderListSerializer,OrderedItemSerializer,CouponSerializer,CartDetailSerializer
+from .serializers import CartListSerializer, GuestCartSerializer,OrderListSerializer,OrderedItemSerializer,CouponSerializer,CartDetailSerializer
 from rest_framework import status
 
 # Create your views here.
@@ -37,9 +33,8 @@ class OrderList(ListAPIView):
 
 class AddToCart(APIView):
     queryset = OrderedItem.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = OrderedItemSerializer
-
     def post(self,request,*args,**kwargs):
         productId = request.data.get('item',None)
         #productId = request.data.get('slug',None) 
@@ -48,9 +43,9 @@ class AddToCart(APIView):
             return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
         item = get_object_or_404(ProductDetail,id=productId)
         user = Account.objects.get(id=request.user.id)
-
-        cart, created = Cart.objects.get_or_create(customer=user,ordered=False)       
-        cart.save()     
+        customer = Customer.objects.get(email=user.email)
+        cart, created = Cart.objects.get_or_create(customer=customer,ordered=False)
+        cart.save() 
         # quantity = int(request.data.get('quantity'))
         quantity = 1
 
@@ -63,7 +58,7 @@ class AddToCart(APIView):
             ordered_item = OrderedItem(cart=cart,item=item,quantity=quantity)
         ordered_item.save()
         cart.total += item.price * quantity
-        cart.discounted = cart.total ##
+        cart.discounted = cart.total ## 
         cart.save()
         return Response(status=HTTP_200_OK)
 
@@ -72,6 +67,42 @@ class updateCart(RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
     permission_classes = [AllowAny]
     serializer_class = OrderedItemSerializer
+
+class GuestCart(APIView):
+    queryset = OrderedItem.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = GuestCartSerializer
+
+    def post(self,request,*args,**kwargs):
+        productId = request.data.get('item',None)
+        customerMail  = request.data.get('email',None)
+        quantity  = int(request.data.get('quantity',None))
+        if productId is None:
+            return Response({"message":"Invalid request"},status=HTTP_400_BAD_REQUEST)
+
+        item = get_object_or_404(ProductDetail,id=productId)
+        customer,created = Customer.objects.get_or_create(email=customerMail)
+        customer.save()
+        cart, created = Cart.objects.get_or_create(customer=customer,ordered=False)
+        cart.save() 
+        # quantity = int(request.data.get('quantity'))
+
+        #if object is already in the cart
+        # ordered_item, created_oitem = OrderedItem.objects.get_or_create(cart=cart,item=item,quantity=quantity)
+        try:
+            ordered_item = OrderedItem.objects.get(cart=cart,item=item)
+            cart.total -= item.price*ordered_item.quantity
+            cart.save()
+            ordered_item.quantity = quantity
+        except OrderedItem.DoesNotExist:
+            ordered_item = OrderedItem(cart=cart,item=item,quantity=quantity)
+        ordered_item.save()
+        cart.total += item.price * quantity
+        cart.discounted = cart.total ## 
+        cart.save()
+        return Response(status=HTTP_200_OK)
+    
+
 
 class addCoupon(RetrieveUpdateDestroyAPIView):
     queryset = Cart.objects.all()
@@ -94,8 +125,12 @@ class userCart(ListAPIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     def get_queryset(self):
         user = self.request.user
-        queryset = Cart.objects.filter(customer=user,ordered=False)
+        customer = Customer.objects.get(email=user.email)
+        queryset = Cart.objects.filter(customer=customer,ordered=False)
         return queryset
+
+
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

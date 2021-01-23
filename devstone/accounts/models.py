@@ -44,6 +44,8 @@ class Account(AbstractBaseUser):
     ]
     username = None
     email					= models.EmailField(verbose_name="email", max_length=60, unique=True)
+
+    #detailed data about user
     first_name              = models.CharField(max_length=200)
     last_name               = models.CharField(max_length=200)
     phone                   = models.CharField(verbose_name="phone",max_length=30,blank=True,null=True)
@@ -51,6 +53,7 @@ class Account(AbstractBaseUser):
     last_login              = models.DateTimeField(verbose_name='last login', auto_now=True)
     date_of_birth           = models.DateField(verbose_name='birth date',blank=True,null=True)
     gender                  = models.CharField(blank=True,null=True,default="B",choices=GENDER_TYPES,max_length=1)
+    #roles
     is_admin                = models.BooleanField(default=False)
     is_active               = models.BooleanField(default=True)
     is_superuser            = models.BooleanField(default=False)
@@ -78,8 +81,13 @@ class Account(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+class Customer(models.Model):
+    email                   = models.EmailField(primary_key=True,max_length=60, unique=True)
+    account                 = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="user",null=True,blank=True)
+    haveAccount             = models.BooleanField(default=False)
+
 class Adress(models.Model):
-    user                    = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="customer")
+    customer                = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="customer")
     adress_first_name       = models.CharField(max_length=100)
     adress_last_name        = models.CharField(max_length=100)
     adress_phone            = models.CharField(verbose_name="phone",max_length=30)
@@ -89,4 +97,3 @@ class Adress(models.Model):
 
     def __str__(self):
         return f"{self.adress_first_name} {self.adress_last_name} - {self.adresss} {self.city}/{self.country}"
-    

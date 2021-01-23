@@ -6,6 +6,29 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from discounts.models import Coupon
 
+
+class GuestCartSerializer(serializers.Serializer):
+    email       = serializers.EmailField()
+    order_items = serializers.JSONField()
+    # item_total  = serializers.SerializerMethodField()
+    class Meta:
+        fields = [
+            'id', 
+            'email',
+            'order_items',
+            ]
+    
+    def 
+    
+    # def get_order_items(self):
+    #     mydict = {
+    #         "name": obj.item.product.name,
+    #         "price": obj.item.price
+    #     }
+    #     return mydict
+    # def get_item_total(self,obj):
+    #     return obj.item.price * obj.quantity
+
 class OrderListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order

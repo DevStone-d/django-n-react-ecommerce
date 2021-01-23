@@ -1,3 +1,4 @@
+from accounts.models import Customer
 from django.shortcuts import render
 
 from rest_framework import status
@@ -6,28 +7,13 @@ from rest_framework.decorators import api_view,authentication_classes,permission
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.authentication import SessionAuthentication,BasicAuthentication
 from rest_framework.generics import (
-    DestroyAPIView,
-    ListAPIView,
-    UpdateAPIView,
-    RetrieveAPIView,
+    CreateAPIView,
     GenericAPIView,
 )
-from rest_framework.viewsets import ModelViewSet
 # # Create your views here.
-# from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-# from rest_auth.registration.views import SocialLoginView
 
-from api.permissions import (
-    IsStore,
-    IsDelivery,
-    IsBurhan,
-    IsEditor,
-    IsStaff,
-    IsAccounting,
-    IsCustomerService,
-    IsBakery
-)
-from api.account.serializers import AccountDetailSerializer,UserSerializer
+
+from api.account.serializers import AccountDetailSerializer,UserSerializer,GuestCustomerSerializer
 
 from accounts.models import Account
 from products.models import ProductDetail
@@ -53,6 +39,7 @@ class AuthInfoUpdateView(GenericAPIView):
             return Response({"message":"Profile succesfully update"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        
-
-        
+class createCustomer(CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = GuestCustomerSerializer
+    queryset = Customer.objects.all()
