@@ -77,6 +77,7 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+    #if is_customer : Customer create
 
     def __str__(self):
         return self.email
@@ -85,6 +86,9 @@ class Customer(models.Model):
     email                   = models.EmailField(primary_key=True,max_length=60, unique=True)
     account                 = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="user",null=True,blank=True)
     haveAccount             = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.email}"
 
 class Adress(models.Model):
     customer                = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="customer")

@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import Account
+from accounts.models import Customer
 from products.models import Product
 # Create your models here.
 
@@ -16,7 +16,7 @@ class Coupon(models.Model):
         # ('6','userBasedPer'),
         # ('7','userBasedPerAbove'),
     ]
-    customer = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="related_user",blank=True, null=True)
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="related_user",blank=True, null=True)
     valid_until = models.DateTimeField()
     coupon_type = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")
     amount = models.IntegerField()

@@ -15,12 +15,25 @@ from accounts.models import Account,Customer
 from cart.models import Order,Cart,OrderedItem
 from discounts.models import Coupon
 from products.models import ProductDetail
+from rest_framework.parsers import JSONParser
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication,BasicAuthentication
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from .serializers import CartListSerializer, GuestCartSerializer,OrderListSerializer,OrderedItemSerializer,CouponSerializer,CartDetailSerializer
 from rest_framework import status
 
 # Create your views here.
+
+
+class guestCartView(APIView):
+    serializer_class = GuestCartSerializer
+    permission_classes = [AllowAny]
+
+    def post(self,request,*args,**kwargs):
+        serializer = GuestCartSerializer(data=request.data)
+        serializer.create_ordered_items(ordered_items=request.data["ordered_items"],email=request.data["email"])
+        serializer.is_valid()
+        serializer.save()
+
 class CartList(ListAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartListSerializer

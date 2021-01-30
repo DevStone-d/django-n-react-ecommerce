@@ -5,29 +5,80 @@ from products.models import Product,ProductDetail
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from discounts.models import Coupon
+from accounts.models import Customer
+
+
+import json
+
+# class SnippetSerializer(serializers.Serializer):
+#     id = serializers.IntegerField(read_only=True)
+#     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
+#     code = serializers.CharField(style={'base_template': 'textarea.html'})
+#     linenos = serializers.BooleanField(required=False)
+
+#     def create(self, validated_data):
+#         """
+#         Create and return a new `Snippet` instance, given the validated data.
+#         """
+#         return Snippet.objects.create(**validated_data)
+
+#     def update(self, instance, validated_data):
+#         """
+#         Update and return an existing `Snippet` instance, given the validated data.
+#         """
+#         instance.title = validated_data.get('title', instance.title)
+#         instance.code = validated_data.get('code', instance.code)
+#         instance.linenos = validated_data.get('linenos', instance.linenos)
+#         instance.language = validated_data.get('language', instance.language)
+#         instance.style = validated_data.get('style', instance.style)
+#         instance.save()
+#         return instance
+
 
 
 class GuestCartSerializer(serializers.Serializer):
-    email       = serializers.EmailField()
-    order_items = serializers.JSONField()
-    # item_total  = serializers.SerializerMethodField()
-    class Meta:
-        fields = [
-            'id', 
-            'email',
-            'order_items',
-            ]
+    email           = serializers.EmailField()
+    ordered_items   = serializers.JSONField()
+    """
+    ordered_items = {
+        item : 28
+        quantity : 1
+    }
+
+    item : ProductDetail.id(unique)
+    """
     
-    def 
-    
-    # def get_order_items(self):
-    #     mydict = {
-    #         "name": obj.item.product.name,
-    #         "price": obj.item.price
-    #     }
-    #     return mydict
-    # def get_item_total(self,obj):
-    #     return obj.item.price * obj.quantity
+
+    def get_or_create_customer(self,email):
+        customer, created = Customer.objects.get_or_create(email=email)
+        customer.save()
+        return customer
+
+    def get_or_create_cart(self,customer):
+        try :
+            cart = Cart.objects.get(customer=customer,ordered=False)
+            cart.delete()
+        except :
+            pass
+        cart = Cart(customer=customer,ordered=False)
+        cart.save()
+        return cart
+
+    def create_ordered_item(self,ordered_item):
+        try :
+            item = ProductDetail.objects.get(id=int(ordered_item["item"]))
+            orderedItem = OrderedItem(cart = self.cart, item = item, quantity = int(ordered_item["quantity"]))
+            orderedItem.save()
+        except:
+            pass
+    def create_ordered_items(self,ordered_items,email):
+        
+        customer = self.get_or_create_customer(email)
+        self.cart = self.get_or_create_cart(customer)
+        ordered_items = json.loads(ordered_items) #SERIALIZER PROBLEMLİ
+        for ordered_item in ordered_items:
+            self.create_ordered_item(ordered_item = ordered_item)
+
 
 class OrderListSerializer(serializers.ModelSerializer):
     class Meta:
