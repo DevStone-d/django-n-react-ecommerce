@@ -16,14 +16,14 @@ class Coupon(models.Model):
         # ('6','userBasedPer'),
         # ('7','userBasedPerAbove'),
     ]
-    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="related_user",blank=True, null=True)
+    customer    = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="related_user",blank=True, null=True)
     valid_until = models.DateTimeField()
     coupon_type = models.CharField(max_length=2,choices=STATUS_MEANS,default="0")
-    amount = models.IntegerField()
-    above = models.IntegerField(blank=True,null=True)
-    code = models.CharField(max_length=50)
-    is_active = models.BooleanField()
-    limited = models.IntegerField()
+    amount      = models.IntegerField()
+    above       = models.IntegerField(blank=True,null=True)
+    code        = models.CharField(max_length=50)
+    is_active   = models.BooleanField()
+    limited     = models.IntegerField()
 
     def __str__(self):
         return self.code

@@ -25,10 +25,8 @@ class Cart(models.Model):
     def has_coupon(self):
         if self.coupon != None:
             coupon = Coupon.objects.filter(code=self.coupon) 
-            if coupon:
-                if coupon[0].customer is None:
-                    return True
-                return False
+            if coupon and  coupon[0].customer is None:
+                return True
             else:
                 return False
         else:
@@ -76,7 +74,6 @@ class Cart(models.Model):
                 return False
             else:
                 return True
-        
         if coupon.coupon_type == '-1':
             return False
         elif coupon.coupon_type == '0' or coupon.coupon_type == '1':
@@ -94,17 +91,14 @@ class Cart(models.Model):
         else:
             return False
             
-
     def get_discounted(self,coupon):
         if self.coupon_is_valid(coupon):
-            if coupon.coupon_type == '0':
+            if coupon.coupon_type == '0' or coupon.coupon_type == '2' :
                 self.discounted -= self.discounted/100*coupon.amount
-            elif coupon.coupon_type == '1':
+            elif coupon.coupon_type == '1' or coupon.coupon_type == '3':
                 self.discounted -= coupon.amount
-            elif coupon.coupon_type == '2':
-                self.discounted = self.discounted/100*coupon.amount
-            elif coupon.coupon_type == '3':
-                self.discounted -= coupon.amount
+            else:
+                self.discounted = self.total
 
     def save(self, *args, **kwargs):
         self.total = self.get_total()
@@ -116,7 +110,6 @@ class Cart(models.Model):
                     self.get_discounted(coupon=coupon)
         else:
             self.coupon = None
-        
         super().save(*args,**kwargs)
 
     def __str__(self):
@@ -132,13 +125,26 @@ class OrderedItem(models.Model):
         return self.item.price * self.quantity
     
     def delete(self, *args, **kwargs):
-        self.cart.save()
         super().delete(*args, **kwargs) 
+        Cart.objects.get(id=self.cart.id).save()
+    
+    def is_duplicate(self):
+        cart_item_duplicate = OrderedItem.objects.filter(cart=self.cart.id,item=self.item.id)
+        return True if cart_item_duplicate else False   
+
+    def set_duplicate(self):
+        duplicate_item = (OrderedItem.objects.filter(cart=self.cart.id,item=self.item.id))[0]
+        duplicate_item.quantity += self.quantity
+        duplicate_item.save()
+        #kendini de sorgulayacak
 
     def save(self, *args, **kwargs):
+        if self.is_duplicate():
+            self.set_duplicate()
         self.total = self.findTotal()
         super().save(*args,**kwargs)
-        self.cart.save()
+        Cart.objects.get(id=self.cart.id).save()
+
     def __str__(self):
         return f"{self.cart.customer} added {self.item} to the cart : {self.cart.id}, id: {self.id}"
 

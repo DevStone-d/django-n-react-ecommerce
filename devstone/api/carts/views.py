@@ -24,15 +24,14 @@ from rest_framework import status
 # Create your views here.
 
 
-class guestCartView(APIView):
+class guestCartView(CreateAPIView):
     serializer_class = GuestCartSerializer
     permission_classes = [AllowAny]
 
     def post(self,request,*args,**kwargs):
         serializer = GuestCartSerializer(data=request.data)
         serializer.create_ordered_items(ordered_items=request.data["ordered_items"],email=request.data["email"])
-        serializer.is_valid()
-        serializer.save()
+        return Response(status=HTTP_200_OK)
 
 class CartList(ListAPIView):
     queryset = Cart.objects.all()

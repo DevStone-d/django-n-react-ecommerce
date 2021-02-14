@@ -44,9 +44,13 @@ class GuestCartSerializer(serializers.Serializer):
         item : 28
         quantity : 1
     }
-
     item : ProductDetail.id(unique)
     """
+    # def create(self, validated_data):
+    #     """
+    #     Create and return a new `Snippet` instance, given the validated data.
+    #     """
+    #     return Snippet.objects.create(**validated_data)
     
 
     def get_or_create_customer(self,email):
@@ -72,7 +76,6 @@ class GuestCartSerializer(serializers.Serializer):
         except:
             pass
     def create_ordered_items(self,ordered_items,email):
-        
         customer = self.get_or_create_customer(email)
         self.cart = self.get_or_create_cart(customer)
         ordered_items = json.loads(ordered_items) #SERIALIZER PROBLEMLİ
